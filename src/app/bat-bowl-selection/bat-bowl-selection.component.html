@@ -1,0 +1,54 @@
+<ion-content [fullscreen]="true">
+  <div  *ngIf="!dispTeamForBowl && !dispTeamForBat" style="text-align: center;"><h1>Toss Time!!</h1></div>
+  <div id="container">
+    <ion-grid>
+      <ion-row *ngIf="!dispTeamForBowl && !dispTeamForBat"> 
+       <ion-col size="10" offset="1">
+        <h2>Who is going to BAT first!</h2>
+        <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="onBatTeamSelected(match.teams.teamA.name,match.teams.teamB.name)">{{match.teams.teamA.name}}</ion-button>
+        <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="onBatTeamSelected(match.teams.teamB.name,match.teams.teamA.name)">{{match.teams.teamB.name}}</ion-button>
+       </ion-col>
+     </ion-row>
+      <ion-row *ngIf="dispTeamForBat">
+       <ion-col size="10" offset="1">
+        <ion-list>
+          <ion-radio-group  (ionChange)="onPlayerDidSelectForBatting($event)">
+            <ion-list-header>
+              <ion-label>Select Opening Batsman</ion-label>
+            </ion-list-header>
+        
+            <ion-item *ngFor="let player of dispTeamForBat">
+              <ion-label>{{player.name}}</ion-label>
+              <ion-radio slot="start" value="{{player.name}}" ></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+       </ion-col>
+     </ion-row>
+     <ion-row *ngIf="dispTeamForBowl">
+      <ion-col size="10" offset="1">
+       <ion-list>
+         <ion-radio-group  (ionChange)="onPlayerDidSelectForBowling($event)">
+           <ion-list-header>
+             <ion-label>Select Opening Bowler</ion-label>
+           </ion-list-header>
+       
+           <ion-item *ngFor="let player of dispTeamForBowl">
+             <ion-label>{{player.name}}</ion-label>
+             <ion-radio slot="start" value="{{player.name}}"></ion-radio>
+           </ion-item>
+         </ion-radio-group>
+       </ion-list>
+      </ion-col>
+    </ion-row>
+    </ion-grid>
+ 
+   </div>
+  </ion-content>
+  <ion-footer >
+  <!--  <ion-button [disabled]="!firstBatsman || !firstBowler" expand="full" shape="round" color="secondary" [routerLink]="['/scoreboard',{
+      firstBatsman : firstBatsman,
+      firstBowler : firstBowler
+    }]">Start Match</ion-button>-->
+     <ion-button [disabled]="!firstBatsman || !firstBowler" expand="full" shape="round" color="secondary" (click)="startMatch()">Start Match</ion-button>
+  </ion-footer>

@@ -11,6 +11,14 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'create-match1',
+    loadChildren: () => import('./create-match1/create-match1.module').then( m => m.CreateMatch1PageModule)
+  },
+  {
+    path: 'scoreboard',
+    loadChildren: () => import('./scoreboard/scoreboard.module').then( m => m.ScoreboardPageModule)
+  },
 ];
 
 @NgModule({

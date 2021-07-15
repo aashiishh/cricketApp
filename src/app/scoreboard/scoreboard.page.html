@@ -1,0 +1,149 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title *ngIf="displayMessage === '' ">Scoreboard</ion-title>
+    <ion-buttons *ngIf="displayMessage === '' " slot="primary">
+      <ion-button color="danger" size="small" slot="icon-only" shape="round" (click)="ionViewWillEnter()">
+        <ion-icon name="sync"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons *ngIf="displayMessage === '' " slot="end">
+      <ion-button (click)="presentPopover()">
+        <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+        <!-- <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon> -->
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+  <ion-grid *ngIf="displayMessage === ''">
+    <ion-row>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <p>Batsman</p>
+      </ion-col>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <p>Bowler</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <h1 *ngIf="isLoading"><ion-spinner name="crescent"></ion-spinner></h1>
+        <h1 *ngIf="!isLoading">{{batsman}}</h1>
+      </ion-col>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <h1 *ngIf="isLoading"><ion-spinner name="crescent"></ion-spinner></h1>
+        <h1 *ngIf="!isLoading">{{bowler}}</h1>
+      </ion-col>
+    </ion-row>
+    <div *ngIf="teamABat">
+    <ion-row>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <h1>{{scoreboard.teamA.runs}}/{{scoreboard.teamA.wickets}}</h1>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <!-- <h1>{{scoreboard.teamA.overs}}.{{scoreboard.teamA.balls}}</h1> -->
+        <h1>{{scoreboard.teamA.overs}}.{{scoreboard.teamA.balls}}</h1>
+      </ion-col>
+    </ion-row>
+    </div>
+    <div *ngIf="teamBBat">
+      <ion-row>
+        <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+          <h1>{{scoreboard.teamB.runs}}/{{scoreboard.teamB.wickets}}</h1>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+          <!-- <h1>{{scoreboard.teamB.overs}}.{{scoreboard.teamB.balls}}</h1> -->
+          <h1>{{scoreboard.teamB.overs}}.{{scoreboard.teamB.balls}}</h1>
+        </ion-col>
+      </ion-row>
+      </div>
+    <ion-row *ngIf="teamABat && teamOvers.teamAOvers.overs[scoreboard.teamA.overs]">
+      <ion-col *ngFor="let ball of teamOvers.teamAOvers.overs[scoreboard.teamA.overs].balls" style="text-align: center;" size-sm="6" offset-sm="3">
+       <p *ngIf="ball.status === 'runs' || ball.status === 'dot' || ball.status === 'iopa'">{{ball.run}}</p> 
+       <p *ngIf="ball.status === 'wicket' || ball.status === 'DOPA'">W</p>
+       <p *ngIf="ball.status === 'wide'">1/w</p>
+       <p *ngIf="ball.status === 'no'">1/n</p>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="teamBBat && teamOvers.teamBOvers.overs[scoreboard.teamB.overs]">
+      <ion-col *ngFor="let ball of teamOvers.teamBOvers.overs[scoreboard.teamB.overs].balls" style="text-align: center;" size-sm="6" offset-sm="3">
+       <p *ngIf="ball.status === 'runs' || ball.status === 'dot' || ball.status === 'iopa'">{{ball.run}}</p> 
+       <p *ngIf="ball.status === 'wicket' || ball.status === 'DOPA'">W</p>
+       <p *ngIf="ball.status === 'wide'">1/w</p>
+       <p *ngIf="ball.status === 'no'">1/n</p>
+      </ion-col>
+    </ion-row>
+
+    <ion-row *ngIf="currentMatch.teams.teamA.bat_bowl_first === 'bat' && currentMatch.teams.teamA.currentStatus === 'bowl'">
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <div *ngIf="((currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)) > -1">
+        <h1>Team {{currentMatch.teams.teamB.name}} required {{(currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamBOvers.currentOver)*6)+(teamOvers.teamBOvers.currentBall))}} ball(s)</h1>
+      </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="currentMatch.teams.teamB.bat_bowl_first === 'bat' && currentMatch.teams.teamB.currentStatus === 'bowl'">
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <div *ngIf="((currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)) > -1">
+        <h1>Team {{currentMatch.teams.teamA.name}} required {{(currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamAOvers.currentOver)*6)+(teamOvers.teamAOvers.currentBall))}} ball(s)</h1>
+      </div>
+      </ion-col>
+    </ion-row>
+    
+  </ion-grid>
+
+  <ion-grid *ngIf="displayMessage !== ''">
+    <ion-row>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+        <h1>{{displayMessage}}</h1>
+      </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+          <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="finishMatch()"><ion-icon name="stop-circle-outline"></ion-icon>Finish Match</ion-button>
+        </ion-col>
+        </ion-row>
+      </ion-grid>
+
+  <ion-tabs *ngIf="displayMessage === ''">
+    <ion-tab-bar slot="bottom" class="bottomcolor">
+      <ion-tab-button (click)="onBallDone(1,'wide')">
+        <ion-label>w</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(1,'no')">
+        <ion-label>n</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(0,'dot')">
+        <ion-label>0</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(1,'runs')">
+        <ion-label>1</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(2,'runs')">
+        <ion-label>2</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(3,'runs')">
+        <ion-label>3</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(4,'runs')">
+        <ion-label>4</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="onBallDone(6,'runs')">
+        <ion-label>6</ion-label>
+      </ion-tab-button>
+      <!-- <ion-tab-button (click)="onBallDone(0,'iopa')">
+        <ion-label>IOPA</ion-label>
+      </ion-tab-button> -->
+      <ion-tab-button>
+        <ion-select placeholder="wicket" (ionChange)="onWicket(wt.value)" interface="popover" #wt>
+          <ion-select-option value="b" >bowled</ion-select-option>
+          <ion-select-option value="c">catch</ion-select-option>
+          <ion-select-option value="d">DOPA</ion-select-option>
+          </ion-select>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-content>

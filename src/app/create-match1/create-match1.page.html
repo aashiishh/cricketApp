@@ -1,0 +1,91 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Welcome!!</ion-title>
+    <ion-buttons *ngIf="teamA.name && teamB.name" slot="primary">
+      <ion-button color="danger" fill="clear" (click)="onAddPlayer()">
+        Add Player
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <form (ngSubmit)="onTeamsNameSubmitted()" #f="ngForm">
+    <ion-row *ngIf="!teamA.name && !teamB.name" >
+      <ion-col size="10" offset="1">
+        <ion-item>
+          <ion-label position="floating">Enter name for teamA</ion-label>
+          <ion-input type="text" ngModel name="name1" required></ion-input>
+        </ion-item>
+        <br>
+        <ion-item>
+          <ion-label position="floating">Enter name for teamB</ion-label>
+          <ion-input type="text" ngModel name="name2" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Number of overs per Team</ion-label>
+          <ion-input type="number" ngModel name="oversCount" required></ion-input>
+        </ion-item> 
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="!teamA.name && !teamB.name">
+      <ion-col size="10" offset="1">
+        <ion-button type="submit" shape="round" expand="block" fill="solid" size="medium" color="danger" [disabled]="!f.valid">Done</ion-button>
+      </ion-col>
+    </ion-row>
+    </form>
+    <ion-row *ngIf="teamA.name && teamB.name">
+      <ion-col class="ion-text-center" size-md="6" offset-md="3">
+        <ion-item>
+          <ion-label>Select Team</ion-label>
+          <ion-select okText="Okay" cancelText="Dismiss" [(ngModel)]="selectedTeam">
+            <ion-select-option value="teamA">{{teamA.name}}</ion-select-option>
+            <ion-select-option value="teamB">{{teamB.name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+      </ion-row>
+        <ion-row *ngIf="teamA.name && teamB.name && !selectedTeam">
+          <ion-col class="ion-text-center" size-md="6" offset-md="3">
+            <ion-list>
+              <ion-list-header>
+                Available Players
+              </ion-list-header>
+              <ion-item *ngFor="let player of playerstoDisplay">
+                <ion-avatar slot="start">
+                   <img src="http://www.ga.berkeley.edu/wp-content/uploads/2015/08/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"> 
+                  <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{player.name}}</h2>
+                  <h3>{{player.description}}</h3>
+                  <!-- <p>Listen, I've had a pretty messed up day...</p> -->
+                </ion-label>
+              </ion-item>
+              </ion-list>
+          </ion-col>
+          </ion-row>
+    <ion-row *ngIf="teamA.name && teamB.name && selectedTeam">
+      <ion-col class="ion-text-center" size-md="6" offset-md="3">
+        <ion-list>
+          <ion-item *ngFor="let player of playerstoDisplay">
+            <ion-label>{{player.name}}</ion-label>
+            <ion-label style="font-size:x-small;">{{player.description}}</ion-label>
+            <ion-checkbox color="secondary" slot="end" [(ngModel)]="player.isSelected" (ionChange)="onPlayerDidSelected(player)"></ion-checkbox>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+    </ion-grid>
+    <ion-fab  *ngIf="teamA.name && teamB.name && selectedTeam" vertical="bottom" horizontal="center" slot="fixed">
+      <ion-fab-button (click)="onCreateTeam()">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button routerLink="/home">
+        <ion-icon name="home-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+</ion-content>

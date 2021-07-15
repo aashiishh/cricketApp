@@ -4,13 +4,14 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
 }
 
 #container strong {
-  font-size: 20px;
+  font-size: 30px;
   line-height: 26px;
+  color: white;
 }
 
 #container p {
@@ -24,4 +25,31 @@
 
 #container a {
   text-decoration: none;
+}
+ .black
+{
+  --background: rgb(49, 91, 230);
+}
+
+ion-button
+{
+  --background: white;
+  --color: blue;
+}
+h1{
+  font-size: 75px;
+  color: white;
+}
+
+h2{
+  font-size: 60px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border: 2px white solid;
+  color: white;
+}
+
+.textsize
+{
+  font-size: small;
 }
