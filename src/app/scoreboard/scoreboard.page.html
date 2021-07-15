@@ -111,15 +111,15 @@
   <ion-tabs *ngIf="displayMessage === ''">
     <ion-tab-bar slot="bottom" class="bottomcolor">
       <ion-tab-button (click)="onBallDone(1,'wide')">
-        <ion-label>w</ion-label>
+        <ion-label>wide</ion-label>
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(1,'no')">
-        <ion-label>n</ion-label>
+        <ion-label>no</ion-label>
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(0,'dot')">
-        <ion-label>0</ion-label>
+        <ion-label>dot</ion-label>
       </ion-tab-button>
-      <ion-tab-button (click)="onBallDone(1,'runs')">
+      <!-- <ion-tab-button (click)="onBallDone(1,'runs')">
         <ion-label>1</ion-label>
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(2,'runs')">
@@ -127,16 +127,16 @@
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(3,'runs')">
         <ion-label>3</ion-label>
-      </ion-tab-button>
+      </ion-tab-button> -->
       <ion-tab-button (click)="onBallDone(4,'runs')">
         <ion-label>4</ion-label>
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(6,'runs')">
         <ion-label>6</ion-label>
       </ion-tab-button>
-      <!-- <ion-tab-button (click)="onBallDone(0,'iopa')">
+       <ion-tab-button (click)="onBallDone(0,'iopa')">
         <ion-label>IOPA</ion-label>
-      </ion-tab-button> -->
+      </ion-tab-button> 
       <ion-tab-button>
         <ion-select placeholder="wicket" (ionChange)="onWicket(wt.value)" interface="popover" #wt>
           <ion-select-option value="b" >bowled</ion-select-option>
