@@ -81,14 +81,14 @@
     <ion-row *ngIf="currentMatch.teams.teamA.bat_bowl_first === 'bat' && currentMatch.teams.teamA.currentStatus === 'bowl'">
       <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
         <div *ngIf="((currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)) > -1">
-        <h1>Team {{currentMatch.teams.teamB.name}} required {{(currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamBOvers.currentOver)*6)+(teamOvers.teamBOvers.currentBall))}} ball(s)</h1>
+        <h1>Team {{currentMatch.teams.teamB.name}} required {{(currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamBOvers.currentOver)*6)+(currentMatch.scoreboard.teamB.balls))}} ball(s)</h1>
       </div>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="currentMatch.teams.teamB.bat_bowl_first === 'bat' && currentMatch.teams.teamB.currentStatus === 'bowl'">
       <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
         <div *ngIf="((currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)) > -1">
-        <h1>Team {{currentMatch.teams.teamA.name}} required {{(currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamAOvers.currentOver)*6)+(teamOvers.teamAOvers.currentBall))}} ball(s)</h1>
+        <h1>Team {{currentMatch.teams.teamA.name}} required {{(currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamAOvers.currentOver)*6)+(currentMatch.scoreboard.teamA.balls))}} ball(s)</h1>
       </div>
       </ion-col>
     </ion-row>
