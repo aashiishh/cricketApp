@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'scoreboard',
     loadChildren: () => import('./scoreboard/scoreboard.module').then( m => m.ScoreboardPageModule)
   },
+  {
+    path: 'rematch-selection',
+    loadChildren: () => import('./rematch-selection/rematch-selection.module').then( m => m.RematchSelectionPageModule)
+  },
 ];
 
 @NgModule({

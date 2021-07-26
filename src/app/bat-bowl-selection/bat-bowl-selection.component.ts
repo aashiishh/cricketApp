@@ -61,7 +61,6 @@ export class BatBowlSelectionComponent implements OnInit {
           }
           else
             player.onPitch = false;
-            player.isWicket = false;
       })
     }
     else
@@ -72,7 +71,6 @@ export class BatBowlSelectionComponent implements OnInit {
           }
           else
             player.onPitch = false;
-            player.isWicket = false;
         })
     }
   }
@@ -104,16 +102,7 @@ export class BatBowlSelectionComponent implements OnInit {
 
   startMatch()
   {
-    /*this.modalCtrl.dismiss({
-      newMatchData : {
-        batTeam : this.batTeam,
-        bowTeam : this.bowlTeam,
-        firstBatsman : this.firstBatsman,
-        firstBowler : this.firstBowler,
-        match : this.match
-      }
-    },'confirm');*/
-      this.modalCtrl.dismiss(); 
+    this.modalCtrl.dismiss(); 
   }
 
   ionViewWillLeave()

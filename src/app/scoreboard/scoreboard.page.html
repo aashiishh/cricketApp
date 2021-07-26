@@ -17,79 +17,112 @@
 <ion-content>
 
   <ion-grid *ngIf="displayMessage === ''">
-    <ion-row>
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <p>Batsman</p>
-      </ion-col>
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <p>Bowler</p>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <h1 *ngIf="isLoading"><ion-spinner name="crescent"></ion-spinner></h1>
-        <h1 *ngIf="!isLoading">{{batsman}}</h1>
-      </ion-col>
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <h1 *ngIf="isLoading"><ion-spinner name="crescent"></ion-spinner></h1>
-        <h1 *ngIf="!isLoading">{{bowler}}</h1>
-      </ion-col>
-    </ion-row>
     <div *ngIf="teamABat">
-    <ion-row>
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <h1>{{scoreboard.teamA.runs}}/{{scoreboard.teamA.wickets}}</h1>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <!-- <h1>{{scoreboard.teamA.overs}}.{{scoreboard.teamA.balls}}</h1> -->
-        <h1>{{scoreboard.teamA.overs}}.{{scoreboard.teamA.balls}}</h1>
-      </ion-col>
-    </ion-row>
-    </div>
-    <div *ngIf="teamBBat">
       <ion-row>
         <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-          <h1>{{scoreboard.teamB.runs}}/{{scoreboard.teamB.wickets}}</h1>
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Score</ion-card-subtitle>
+              <ion-card-title>{{scoreboard.teamA.runs}}/{{scoreboard.teamA.wickets}}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-          <!-- <h1>{{scoreboard.teamB.overs}}.{{scoreboard.teamB.balls}}</h1> -->
-          <h1>{{scoreboard.teamB.overs}}.{{scoreboard.teamB.balls}}</h1>
+          <!-- <h1>{{scoreboard.teamA.overs}}.{{scoreboard.teamA.balls}}</h1> -->
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Overs</ion-card-subtitle>
+              <ion-card-title>{{scoreboard.teamA.overs}}.{{scoreboard.teamA.balls}}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-row *ngIf="teamOvers.teamAOvers.overs[scoreboard.teamA.overs]">
+                <ion-col *ngFor="let ball of teamOvers.teamAOvers.overs[scoreboard.teamA.overs].balls" style="text-align: center;" size-sm="6" offset-sm="3">
+                 <p *ngIf="ball.status === 'runs' || ball.status === 'dot' || ball.status === 'iopa'">{{ball.run}}</p> 
+                 <p *ngIf="ball.status === 'wicket' || ball.status === 'DOPA'">W</p>
+                 <p *ngIf="ball.status === 'wide'">1/w</p>
+                 <p *ngIf="ball.status === 'no'">1/n</p>
+                </ion-col>
+              </ion-row>
+              <div *ngIf="currentMatch.teams.teamB.bat_bowl_first === 'bat' && currentMatch.teams.teamB.currentStatus === 'bowl'">
+                <div *ngIf="((currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)) > -1">
+                  Team <b>{{currentMatch.teams.teamA.name}}</b> required <b>{{(currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)}}</b> runs in <b>{{((teamOvers.oversCount)*6)-(((teamOvers.teamAOvers.currentOver)*6)+(currentMatch.scoreboard.teamA.balls))}}</b> ball(s)
+                </div>
+                </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
       </div>
-    <ion-row *ngIf="teamABat && teamOvers.teamAOvers.overs[scoreboard.teamA.overs]">
-      <ion-col *ngFor="let ball of teamOvers.teamAOvers.overs[scoreboard.teamA.overs].balls" style="text-align: center;" size-sm="6" offset-sm="3">
-       <p *ngIf="ball.status === 'runs' || ball.status === 'dot' || ball.status === 'iopa'">{{ball.run}}</p> 
-       <p *ngIf="ball.status === 'wicket' || ball.status === 'DOPA'">W</p>
-       <p *ngIf="ball.status === 'wide'">1/w</p>
-       <p *ngIf="ball.status === 'no'">1/n</p>
+      <div *ngIf="teamBBat">
+        <ion-row>
+          <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-subtitle>Score</ion-card-subtitle>
+                <ion-card-title>{{scoreboard.teamB.runs}}/{{scoreboard.teamB.wickets}}</ion-card-title>
+              </ion-card-header>
+              <!-- <ion-card-content *ngIf="currentMatch.teams.teamA.bat_bowl_first === 'bat' && currentMatch.teams.teamA.currentStatus === 'bowl'">
+                <div *ngIf="((currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)) > -1">
+                  Required run rate - {{(currentMatch.scoreboard.teamA.runs+1)/(((teamOvers.oversCount)*6)-(((teamOvers.teamBOvers.currentOver)*6)+(currentMatch.scoreboard.teamB.balls)))}}/Ball
+                </div>
+              </ion-card-content> -->
+            </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-subtitle>Overs</ion-card-subtitle>
+                <ion-card-title>{{scoreboard.teamB.overs}}.{{scoreboard.teamB.balls}}</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-row *ngIf="teamOvers.teamBOvers.overs[scoreboard.teamB.overs]">
+                  <ion-col *ngFor="let ball of teamOvers.teamBOvers.overs[scoreboard.teamB.overs].balls" style="text-align: center;" size-sm="6" offset-sm="3">
+                   <p *ngIf="ball.status === 'runs' || ball.status === 'dot' || ball.status === 'iopa'">{{ball.run}}</p> 
+                   <p *ngIf="ball.status === 'wicket' || ball.status === 'DOPA'">W</p>
+                   <p *ngIf="ball.status === 'wide'">1/w</p>
+                   <p *ngIf="ball.status === 'no'">1/n</p>
+                  </ion-col>
+                </ion-row>
+                <div *ngIf="currentMatch.teams.teamA.bat_bowl_first === 'bat' && currentMatch.teams.teamA.currentStatus === 'bowl'">
+                  <div *ngIf="((currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)) > -1">
+                    Team <b>{{currentMatch.teams.teamB.name}}</b> required <b>{{(currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)}}</b> runs in <b>{{((teamOvers.oversCount)*6)-(((teamOvers.teamBOvers.currentOver)*6)+(currentMatch.scoreboard.teamB.balls))}}</b> ball(s)
+                  </div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+        </div>
+    <ion-row>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="1">
+        <h1 *ngIf="isLoading"><ion-spinner name="crescent"></ion-spinner></h1>
+          <ion-item *ngIf="!isLoading">
+            <ion-avatar slot="start">
+              <img src={{batsman.imgUrl}}>
+            </ion-avatar>
+            <ion-label>
+              <h3>Batsman</h3>
+              <h1>{{batsman.name}}</h1>
+              <p>Runs : <b>{{batsman.runs}}</b> | Balls Played : <b>{{batsman.ballsPlayed}}</b></p>
+            </ion-label>
+          </ion-item>
       </ion-col>
-    </ion-row>
-    <ion-row *ngIf="teamBBat && teamOvers.teamBOvers.overs[scoreboard.teamB.overs]">
-      <ion-col *ngFor="let ball of teamOvers.teamBOvers.overs[scoreboard.teamB.overs].balls" style="text-align: center;" size-sm="6" offset-sm="3">
-       <p *ngIf="ball.status === 'runs' || ball.status === 'dot' || ball.status === 'iopa'">{{ball.run}}</p> 
-       <p *ngIf="ball.status === 'wicket' || ball.status === 'DOPA'">W</p>
-       <p *ngIf="ball.status === 'wide'">1/w</p>
-       <p *ngIf="ball.status === 'no'">1/n</p>
-      </ion-col>
-    </ion-row>
-
-    <ion-row *ngIf="currentMatch.teams.teamA.bat_bowl_first === 'bat' && currentMatch.teams.teamA.currentStatus === 'bowl'">
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <div *ngIf="((currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)) > -1">
-        <h1>Team {{currentMatch.teams.teamB.name}} required {{(currentMatch.scoreboard.teamA.runs+1) - (currentMatch.scoreboard.teamB.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamBOvers.currentOver)*6)+(currentMatch.scoreboard.teamB.balls))}} ball(s)</h1>
-      </div>
-      </ion-col>
-    </ion-row>
-    <ion-row *ngIf="currentMatch.teams.teamB.bat_bowl_first === 'bat' && currentMatch.teams.teamB.currentStatus === 'bowl'">
-      <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
-        <div *ngIf="((currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)) > -1">
-        <h1>Team {{currentMatch.teams.teamA.name}} required {{(currentMatch.scoreboard.teamB.runs+1) - (currentMatch.scoreboard.teamA.runs)}} runs in {{((teamOvers.oversCount)*6)-(((teamOvers.teamAOvers.currentOver)*6)+(currentMatch.scoreboard.teamA.balls))}} ball(s)</h1>
-      </div>
+      <ion-col style="text-align: center;" size-sm="6" offset-sm="1">
+        <h1 *ngIf="isLoading"><ion-spinner name="crescent"></ion-spinner></h1>
+        <ion-item *ngIf="!isLoading">
+          <ion-avatar slot="start">
+            <img src={{bowler.imgUrl}}>
+          </ion-avatar>
+          <ion-label>
+            <h3>Bowler</h3>
+            <h1>{{bowler.name}}</h1>
+            <p>Wickets Taken : <b>{{bowler.wicketsTaken}}</b> | Runs Given : <b>{{bowler.runsGiven}}</b></p>
+          </ion-label>
+        </ion-item>
       </ion-col>
     </ion-row>
     
@@ -103,6 +136,7 @@
       </ion-row>
       <ion-row>
         <ion-col style="text-align: center;" size-sm="6" offset-sm="3">
+          <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="restartMatch()"><ion-icon name="refresh"></ion-icon>Restart Match</ion-button>
           <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="finishMatch()"><ion-icon name="stop-circle-outline"></ion-icon>Finish Match</ion-button>
         </ion-col>
         </ion-row>
@@ -110,7 +144,7 @@
 
   <ion-tabs *ngIf="displayMessage === ''">
     <ion-tab-bar slot="bottom" class="bottomcolor">
-      <ion-tab-button (click)="onBallDone(1,'wide')">
+      <ion-tab-button size="large" (click)="onBallDone(1,'wide')">
         <ion-label>wide</ion-label>
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(1,'no')">
@@ -129,10 +163,10 @@
         <ion-label>3</ion-label>
       </ion-tab-button> -->
       <ion-tab-button (click)="onBallDone(4,'runs')">
-        <ion-label>4</ion-label>
+        <ion-label >4</ion-label>
       </ion-tab-button>
       <ion-tab-button (click)="onBallDone(6,'runs')">
-        <ion-label>6</ion-label>
+        <ion-label >6</ion-label>
       </ion-tab-button>
        <ion-tab-button (click)="onBallDone(0,'iopa')">
         <ion-label>IOPA</ion-label>

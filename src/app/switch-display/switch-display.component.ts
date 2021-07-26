@@ -22,8 +22,7 @@ export class SwitchDisplayComponent implements OnInit {
   }
 
   ngOnInit() { 
-    console.log(this.teams.battingTeam);
-    console.log(this.match.scoreboard);
+  
   }
 
   onPlayerDidSelectForBatting(value) {
@@ -79,11 +78,5 @@ export class SwitchDisplayComponent implements OnInit {
           this.modalCtrl.dismiss({});
       })
     })
-   /* this.modalCtrl.dismiss({
-      newData: {
-        batsman: this.firstBatsman,
-        bowler: this.firstBowler
-      }
-    }, 'confirm');*/
   }
 }
