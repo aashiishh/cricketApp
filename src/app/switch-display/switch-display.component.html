@@ -1,6 +1,8 @@
 <ion-content [fullscreen]="true">
-  <div style="text-align: center;"><h1>!!Selection!!</h1></div>
-  <div id="container">
+  <div style="text-align: center;font-family: 'Times New Roman', Times, serif;font-size: 20px;">
+    <h1>!!Selection!!</h1>
+    <p *ngIf="message !== ''">{{message}}</p>
+  </div>
     <ion-grid>
       <ion-row *ngIf="teams.battingTeam">
        <ion-col size="10" offset="1">
@@ -35,8 +37,6 @@
       </ion-col>
     </ion-row>
     </ion-grid>
- 
-   </div>
   </ion-content>
   <ion-footer >
      <ion-button [disabled]="!firstBatsman || !firstBowler" expand="full" shape="round" color="secondary" (click)="onStart()">Start Second Innings</ion-button>

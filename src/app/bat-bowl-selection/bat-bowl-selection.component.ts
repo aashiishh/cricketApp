@@ -58,6 +58,7 @@ export class BatBowlSelectionComponent implements OnInit {
       this.match.teams.teamA.players.forEach(player => {
            if(player.name === this.firstBatsman){
               player.onPitch = true;
+              player.isWicket = false;
           }
           else
             player.onPitch = false;
@@ -68,6 +69,7 @@ export class BatBowlSelectionComponent implements OnInit {
         this.match.teams.teamB.players.forEach(player => {
           if(player.name === this.firstBatsman){
             player.onPitch = true;
+            player.isWicket = false;
           }
           else
             player.onPitch = false;
@@ -107,7 +109,6 @@ export class BatBowlSelectionComponent implements OnInit {
 
   ionViewWillLeave()
   {
-    console.log(this.match)
     this.service.onUpdateBatBowlSelectionOrMatchScore(this.match).subscribe(result => {
     });
   }

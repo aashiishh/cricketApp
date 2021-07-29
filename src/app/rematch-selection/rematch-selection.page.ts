@@ -50,11 +50,11 @@ export class RematchSelectionPage implements OnInit,OnDestroy {
     }).then(loader => {
       loader.present();
       let matchNumber = (this.loadedMatches.length)+1;
-      let l_id = 'match'+matchNumber;
+      let l_id = 'Match'+matchNumber;
       let l_teams = this.currentMatch.teams;
       l_teams.teamA.players.forEach(player =>{
         player.ballsPlayed = 0;
-        player.isWicket = false;
+        player.isWicket = undefined;
         player.onPitch = false;
         player.wicketsTaken = 0;
         player.runsGiven = 0;
@@ -62,7 +62,7 @@ export class RematchSelectionPage implements OnInit,OnDestroy {
       })
       l_teams.teamB.players.forEach(player =>{
         player.ballsPlayed = 0;
-        player.isWicket = false;
+        player.isWicket = undefined;
         player.onPitch = false;
         player.wicketsTaken = 0;
         player.runsGiven = 0;

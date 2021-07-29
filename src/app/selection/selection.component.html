@@ -1,3 +1,80 @@
-<p>
-  selection works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{match.id}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="tertiary" size="small" (click)="close()">
+        close
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-chip outline color="tertiary">
+          <ion-label>{{match.teams.teamA.name}} v/s {{match.teams.teamB.name}}</ion-label>
+        </ion-chip>
+      </ion-card-title>
+      <ion-card-subtitle>
+        <div *ngIf="match.matchStatus.whoWon === 'NA'">
+          Match was a Tie!!
+        </div>
+        <div *ngIf="match.matchStatus.whoWon !== 'NA'">
+          Team {{match.matchStatus.whoWon}} has won the match by {{match.matchStatus.wonBy}}
+        </div>
+      </ion-card-subtitle>
+    </ion-card-header>
+  </ion-card>
+  <ion-list>
+    <ion-list-header>
+      Team {{winTeam.name}}
+    </ion-list-header>
+    <ion-item *ngFor="let player of winTeam.players">
+      <ion-avatar slot="start">
+        <img src="{{player.imgUrl}}">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{player.name}}</h2>
+        <div *ngIf="player.isWicket === undefined">
+          <h3>Did not get the Batting</h3>
+      </div>
+      <div *ngIf="player.isWicket === false">
+        <h3>Runs Scored : {{player.runs}}</h3>
+      </div>
+      <div *ngIf="player.isWicket === true">
+        <h3>Runs Scored : {{player.runs}}</h3>
+      </div>
+      <div *ngIf="player.wicketsTaken > 0">
+        <h3>Wickets Taken : {{player.wicketsTaken}}</h3>
+      </div>
+      </ion-label>
+    </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        Team {{lostTeam.name}}
+      </ion-list-header>
+      <ion-item *ngFor="let player of lostTeam.players">
+        <ion-avatar slot="start">
+          <img src="{{player.imgUrl}}">
+        </ion-avatar>
+        <ion-label>
+          <h2>{{player.name}}</h2>
+          <div *ngIf="player.isWicket === undefined">
+            <h3>Did not get the Batting</h3>
+        </div>
+        <div *ngIf="player.isWicket === false">
+          <h3>Runs Scored : {{player.runs}}</h3>
+        </div>
+        <div *ngIf="player.isWicket === true">
+          <h3>Runs Scored : {{player.runs}}</h3>
+        </div>
+        <div *ngIf="player.wicketsTaken > 0">
+          <h3>Wickets Taken : {{player.wicketsTaken}}</h3>
+        </div>
+        </ion-label>
+      </ion-item>
+      </ion-list>
+</ion-content>

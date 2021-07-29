@@ -27,7 +27,7 @@
     </ion-row>
     <ion-row *ngIf="loadedMatches && loadedMatches.length>=1">
       <ion-col size="10" offset="1">
-      <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="showResults()">Today's Matches</ion-button>
+      <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" routerLink="/todays-matches">Today's Matches</ion-button>
     </ion-col>
   </ion-row>
      <ion-row >

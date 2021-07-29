@@ -220,7 +220,7 @@ teams : Teams = {
         }).then(loader => {
           loader.present();
           let matchNumber = (this.loadedMatches.length)+1;
-          this.match.id = 'match'+matchNumber;
+          this.match.id = 'Match'+matchNumber;
           this.match.matchStatus = {
             status : 'live',
             whoWon : '',

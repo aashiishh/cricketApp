@@ -14,6 +14,7 @@ export class SwitchDisplayComponent implements OnInit {
     battingTeam: Team,
     bowlingTeam: Team
   }
+  message : string = '';
   @Input() match : Match;
   firstBatsman: string;
   firstBowler: string;
@@ -22,7 +23,14 @@ export class SwitchDisplayComponent implements OnInit {
   }
 
   ngOnInit() { 
-  
+    if(this.match.teams.teamA.currentStatus === 'bat')
+        this.message = 'Team '+this.match.teams.teamB.name+' required '+(this.match.scoreboard.teamA.runs+1)+' runs from '+this.match.teamOvers.oversCount+' overs'
+    else
+        this.message = 'Team '+this.match.teams.teamA.name+' required '+(this.match.scoreboard.teamB.runs+1)+' runs from '+this.match.teamOvers.oversCount+' overs'
+   }
+  ionViewWillEnter()
+  {
+    
   }
 
   onPlayerDidSelectForBatting(value) {
@@ -40,14 +48,16 @@ export class SwitchDisplayComponent implements OnInit {
       this.match.teams.teamA.currentStatus = 'bowl';
       this.match.teams.teamB.currentStatus = 'bat';
       this.match.teams.teamB.players.forEach(player => {
-        if(player.name === this.firstBatsman)
+        if(player.name === this.firstBatsman){
            player.onPitch = true;
+           player.isWicket = false;
+        }
         else
            player.onPitch = false;
       })
       this.match.teams.teamA.players.forEach(player => {
         if(player.name === this.firstBowler)
-           player.onPitch = true;
+          player.onPitch = true;
            else
            player.onPitch = false;
       })
@@ -56,15 +66,18 @@ export class SwitchDisplayComponent implements OnInit {
   {
     this.match.teams.teamB.currentStatus = 'bowl';
     this.match.teams.teamA.currentStatus = 'bat';
+    
     this.match.teams.teamB.players.forEach(player => {
       if(player.name === this.firstBowler)
-         player.onPitch = true;
+        player.onPitch = true;
          else
            player.onPitch = false;
     })
     this.match.teams.teamA.players.forEach(player => {
-      if(player.name === this.firstBatsman)
-         player.onPitch = true;
+      if(player.name === this.firstBatsman){
+        player.onPitch = true;
+        player.isWicket = false;
+     }
          else
            player.onPitch = false;
     })

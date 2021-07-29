@@ -23,6 +23,10 @@ const routes: Routes = [
     path: 'rematch-selection',
     loadChildren: () => import('./rematch-selection/rematch-selection.module').then( m => m.RematchSelectionPageModule)
   },
+  {
+    path: 'todays-matches',
+    loadChildren: () => import('./todays-matches/todays-matches.module').then( m => m.TodaysMatchesPageModule)
+  },
 ];
 
 @NgModule({

@@ -1,0 +1,123 @@
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Today's Matches</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      Total Matches - {{loadedMatches.length}}
+    </ion-list-header>
+    <ion-card *ngFor="let match of loadedMatches.slice().reverse() let i = index;">
+      <div>
+      <p *ngIf="match.matchStatus.status === 'live'">
+        <ion-chip color="warning">
+          <ion-icon name="baseball-outline"></ion-icon>
+          <ion-label>{{match.id}}</ion-label>
+        </ion-chip>
+        <ion-chip class="live">
+          <ion-label>Live</ion-label>
+        </ion-chip>
+      </p>
+      <p *ngIf="match.matchStatus.status === 'end'">
+        <ion-chip color="warning">
+          <ion-icon name="baseball-outline"></ion-icon>
+          <ion-label>{{match.id}}</ion-label>
+        </ion-chip>
+      </p>
+    </div>
+      <div *ngIf="match.matchStatus.status === 'live'">
+        <div style="text-align: center;">
+          <img height="40%" width="40%"
+            src="https://static.vecteezy.com/system/resources/thumbnails/001/814/915/small/cricket-logo-with-cross-bat-ball-and-field-modern-professional-sport-retro-style-emblem-and-template-logotype-design-vector.jpg" />
+        </div>
+        <ion-card-header>
+          <ion-card-subtitle>
+            <ion-chip outline color="tertiary">
+              <ion-label>{{match.teams.teamA.name}} v/s {{match.teams.teamB.name}}</ion-label>
+            </ion-chip>
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="match.teams.teamB.bat_bowl_first === 'bat' && match.teams.teamB.currentStatus === 'bat'">
+            <h2>Team {{match.teams.teamB.name}} decided to Bat first and secured {{match.scoreboard.teamB.runs}} runs
+              from {{match.scoreboard.teamB.overs}}.{{match.scoreboard.teamB.balls}} overs with the loss of
+              {{match.scoreboard.teamB.wickets}} wickets</h2>
+            <h2>Team {{match.teams.teamA.name}} is yet to Bat</h2>
+          </div>
+          <div *ngIf="match.teams.teamB.bat_bowl_first === 'bat' && match.teams.teamB.currentStatus === 'bowl'">
+            <h3>Team {{match.teams.teamB.name}} decided to Bat first and secured {{match.scoreboard.teamB.runs}} runs
+              from {{match.scoreboard.teamB.overs}}.{{match.scoreboard.teamB.balls}} overs with the loss of
+              {{match.scoreboard.teamB.wickets}} wickets</h3>
+            <h3>Team {{match.teams.teamA.name}} is chasing the target of {{match.scoreboard.teamB.runs+1}} runs and
+              secured {{match.scoreboard.teamA.runs}} runs from
+              {{match.scoreboard.teamA.overs}}.{{match.scoreboard.teamA.balls}} overs with the loss of
+              {{match.scoreboard.teamA.wickets}} wickets</h3>
+          </div>
+          <div *ngIf="match.teams.teamA.bat_bowl_first === 'bat' && match.teams.teamA.currentStatus === 'bat'">
+            <h3>Team {{match.teams.teamA.name}} decided to Bat first and secured {{match.scoreboard.teamA.runs}} runs
+              from {{match.scoreboard.teamA.overs}}.{{match.scoreboard.teamA.balls}} overs with the loss of
+              {{match.scoreboard.teamA.wickets}} wickets</h3>
+            <h3>Team {{match.teams.teamB.name}} is yet to Bat</h3>
+          </div>
+          <div *ngIf="match.teams.teamA.bat_bowl_first === 'bat' && match.teams.teamA.currentStatus === 'bowl'">
+            <h3>Team {{match.teams.teamA.name}} decided to Bat first and secured {{match.scoreboard.teamA.runs}} runs
+              from {{match.scoreboard.teamA.overs}}.{{match.scoreboard.teamA.balls}} overs with the loss of
+              {{match.scoreboard.teamA.wickets}} wickets</h3>
+            <h3>Team {{match.teams.teamB.name}} is chasing the target of {{match.scoreboard.teamA.runs+1}} runs and
+              secured {{match.scoreboard.teamB.runs}} runs from
+              {{match.scoreboard.teamB.overs}}.{{match.scoreboard.teamB.balls}} overs with the loss of
+              {{match.scoreboard.teamB.wickets}} wickets</h3>
+          </div>
+        </ion-card-content>
+        <div class="smtxt">
+          <ion-button size="small" fill="outline" slot="end" routerLink="/scoreboard">View</ion-button>
+      </div>
+      </div>
+      <div *ngIf="match.matchStatus.status === 'end'">
+        <div style="text-align: center;">
+          <img height="40%" width="40%"
+            src="https://static.vecteezy.com/system/resources/thumbnails/001/814/915/small/cricket-logo-with-cross-bat-ball-and-field-modern-professional-sport-retro-style-emblem-and-template-logotype-design-vector.jpg" />
+        </div>
+        <ion-card-header>
+          <ion-card-subtitle>
+            <ion-chip outline color="tertiary">
+              <ion-label>{{match.teams.teamA.name}} v/s {{match.teams.teamB.name}}</ion-label>
+            </ion-chip>
+          </ion-card-subtitle>
+          <ion-card-title>
+            <div *ngIf="match.matchStatus.whoWon === 'NA'">
+              Match was a Tie!!
+            </div>
+            <div class="smtxt" *ngIf="match.matchStatus.whoWon !== 'NA'">
+              Team {{match.matchStatus.whoWon}} has won the match by {{match.matchStatus.wonBy}}
+            </div>
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="isLoading">
+            <h3>Maximum runs were scored by <ion-spinner name="lines-small"></ion-spinner>
+            </h3>
+            <h3>Highest wickets were taken by <ion-spinner name="lines-small"></ion-spinner>
+            </h3>
+          </div>
+          <div *ngIf="!isLoading">
+            <div *ngFor="let m of data">
+              <div *ngIf="m.matchId === match.id">
+                <h3>Maximum runs were scored by {{m.rPlayer}}({{m.maxRuns}})</h3>
+                <h3>Highest wickets were taken by {{m.wPlayer}}({{m.maxWickets}})</h3>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+        <div class="smtxt">
+            <ion-button size="small" fill="outline" slot="end" (click)="viewMatchDetails(match)">View</ion-button>
+        </div>
+      </div>
+    </ion-card>
+  </ion-list>
+</ion-content>

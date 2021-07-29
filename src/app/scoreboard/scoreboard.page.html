@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Scoreboard</ion-title>
+    <ion-buttons slot="start">
+      <ion-button color="tertiary" size="small" routerLink="/home">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-buttons *ngIf="displayMessage === '' " slot="primary">
       <ion-button color="danger" size="small" slot="icon-only" shape="round" (click)="ionViewWillEnter()">
         <ion-icon name="sync"></ion-icon>

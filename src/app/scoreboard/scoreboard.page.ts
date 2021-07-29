@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionSheetController, IonSelect, LoadingController, ModalController, PopoverController, ToastController } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonSelect, LoadingController, ModalController, PopoverController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ApiServiceService } from '../api-service.service';
 import { Ball } from '../models/ball';
@@ -66,7 +66,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   }
   isLoading: boolean = false;
   private matchSub: Subscription;
-  constructor(private modalCtrl: ModalController,private actionSheetController: ActionSheetController, private toastCtrl: ToastController, private service: ApiServiceService, private loadingCtrl: LoadingController,public popoverController: PopoverController,private router:Router) {}
+  constructor(private alertController:AlertController,private modalCtrl: ModalController,private actionSheetController: ActionSheetController, private toastCtrl: ToastController, private service: ApiServiceService, private loadingCtrl: LoadingController,public popoverController: PopoverController,private router:Router) {}
 
   ngOnInit() {
     this.matchSub = this.service.todaysMatches.subscribe(matches => {
@@ -83,13 +83,13 @@ export class ScoreboardPage implements OnInit, OnDestroy {
             if (player.onPitch && !player.isWicket)
               this.batsman = player;
           })
-          console.log('Batsman - ', this.batsman)
+      
           this.bowlingTeam = this.currentMatch.teams.teamB;
           this.bowlingTeam.players.forEach(player => {
             if (player.onPitch)
               this.bowler = player;
           })
-          console.log('Bowler - ', this.bowler)
+      
         }
         if (this.currentMatch.teams.teamB.currentStatus === 'bat') {
           this.teamBBat = true;
@@ -99,13 +99,11 @@ export class ScoreboardPage implements OnInit, OnDestroy {
             if (player.onPitch && !player.isWicket)
               this.batsman = player;
           })
-          console.log('Batsman - ', this.batsman)
           this.bowlingTeam = this.currentMatch.teams.teamA;
           this.bowlingTeam.players.forEach(player => {
             if (player.onPitch)
               this.bowler = player;
           })
-          console.log('Bowler - ', this.bowler)
         }
       }
     })
@@ -152,7 +150,6 @@ export class ScoreboardPage implements OnInit, OnDestroy {
       else
       this.teamOvers.teamAOvers.overs[this.teamOvers.teamAOvers.currentOver].balls.push(ball);
       this.teamOvers.teamAOvers.currentBall++;
-      console.log(this.currentMatch)
       if (this.scoreboard.teamA.balls === 6) 
           this.afterSixBalls(false);  //if 6 balls done
       else {
@@ -198,7 +195,6 @@ export class ScoreboardPage implements OnInit, OnDestroy {
      else
      this.teamOvers.teamBOvers.overs[this.teamOvers.teamBOvers.currentOver].balls.push(ball);
      this.teamOvers.teamBOvers.currentBall++;
-     console.log(this.currentMatch)
       if (this.scoreboard.teamB.balls === 6)
         this.afterSixBalls(false);  //if 6 balls done
       else {
@@ -422,21 +418,23 @@ export class ScoreboardPage implements OnInit, OnDestroy {
             // this.battingTeam.players[index].onPitch=true;
             if (this.teamABat) {
               this.currentMatch.teams.teamA.players.forEach(p => {
-                if (p.name === player.name)
+                if (p.name === player.name){
                   p.onPitch = true;
+                  p.isWicket = false;
+                }
                 if (this.batsman.name === p.name) {
                   p.onPitch = false;
-                  console.log(p.name, "got false")
                 }
               })
             }
             if (this.teamBBat) {
               this.currentMatch.teams.teamB.players.forEach(p => {
-                if (p.name === player.name)
+                if (p.name === player.name){
                   p.onPitch = true;
+                  p.isWicket = false;
+                }
                 if (this.batsman.name === p.name) {
                   p.onPitch = false;
-                  console.log(p.name, "got false")
                 }
               })
             }
@@ -464,8 +462,9 @@ export class ScoreboardPage implements OnInit, OnDestroy {
               this.currentMatch.teams.teamA.players.forEach(p => {
                 if (p.name === player.name){
                   p.onPitch = true;
+                  p.isWicket = false;
                 }
-                if (this.batsman.name === p.name) {
+                if (this.batsman.name === p.name) {  // setting current Batsman as out
                   p.onPitch = false;
                   p.isWicket = true;
                 }
@@ -478,6 +477,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
               this.currentMatch.teams.teamB.players.forEach(p => {
                 if (p.name === player.name){
                   p.onPitch = true;
+                  p.isWicket = false;
                 }
                 if (this.batsman.name === p.name) {
                   p.onPitch = false;
@@ -638,7 +638,6 @@ export class ScoreboardPage implements OnInit, OnDestroy {
 
   afterSixBalls(ifLastBall: boolean) {
     const check = this.onOverCompleted(); // doing changes for over completion
-    console.log('check is-',check)
     if(!check)
     {
     if (this.teamABat && this.teamOvers.teamAOvers.currentOver === this.teamOvers.oversCount) 
@@ -791,5 +790,66 @@ export class ScoreboardPage implements OnInit, OnDestroy {
     if (this.matchSub)
       this.matchSub.unsubscribe();
   }
+  /*async presentAlertRadio() {
+    const alert = await this.alertController.create({
+      header: 'Radio',
+      inputs: [
+        {
+          name: 'radio1',
+          type: 'radio',
+          label: 'Radio 1',
+          value: 'value1',
+          checked: true
+        },
+        {
+          name: 'radio2',
+          type: 'radio',
+          label: 'Radio 2',
+          value: 'value2'
+        },
+        {
+          name: 'radio3',
+          type: 'radio',
+          label: 'Radio 3',
+          value: 'value3'
+        },
+        {
+          name: 'radio4',
+          type: 'radio',
+          label: 'Radio 4',
+          value: 'value4'
+        },
+        {
+          name: 'radio5',
+          type: 'radio',
+          label: 'Radio 5',
+          value: 'value5'
+        },
+        {
+          name: 'radio6',
+          type: 'radio',
+          label: 'Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 ',
+          value: 'value6'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
+          }
+        }, {
+          text: 'Ok',
+          handler: () => {
+            console.log('Confirm Ok');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }*/
 
 }
