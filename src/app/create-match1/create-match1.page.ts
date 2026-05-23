@@ -68,32 +68,13 @@ teams : Teams = {
     });
     this.matchSub = this.apiService.todaysMatches.subscribe(matches => {
       this.loadedMatches = matches;
-      console.log('All Matches - ',this.loadedMatches.length) 
+      console.log('All Matches - ',this.loadedMatches.length)
  })
     this.playerstoDisplay = this.loadedPlayers;
   }
 
   ionViewWillEnter()
-  { 
-    /*this.modalCtrl.create({
-      component: BatBowlSelectionComponent,
-      componentProps: {teams : this.teams}
-    }).then(modal => {
-      modal.present();
-       return modal.onDidDismiss();
-    }).then(() => {
-      console.log("Model Closed")
-      this.loadingCtrl.dismiss(); //loading started at bat-bowl-selection
-      this.toastCtrl.create({
-        message: 'Match Started!!',
-        color: 'dark',
-        position: 'middle',
-        duration: 3000
-      }).then(toast => {
-        toast.present();
-        // this.router.navigateByUrl('/scoreboard');
-      })
-    })*/
+  {
       this.isLoading = true;
       this.apiService.fetchPlayersList().subscribe(() => {
         this.isLoading = false;
@@ -141,13 +122,21 @@ teams : Teams = {
 
   onTeamsNameSubmitted()
   {
+    this.loadingCtrl.create({
+      message: 'getting Players list...'
+    }).then(loader => {
+      loader.present();
+    setTimeout(()=> {
+      loader.dismiss();
+    },4000)
+  });
     if(!this.form1.valid)
     return;
     this.teamA.name = this.form1.value['name1'];
     this.teamB.name = this.form1.value['name2'];
     const oversCount = this.form1.value['oversCount'];
     for(let i=0;i<oversCount;i++)
-    { 
+    {
       let ballsA  = [];
       let ballsB  = [];
       let ballA: Ball = {
@@ -179,20 +168,24 @@ teams : Teams = {
   {
       if(selectedPlayer.isSelected && this.selectedTeam === "teamA")
       {
+        selectedPlayer.ballsPlayed = 0;
+        selectedPlayer.wicketsTaken = 0;
+        selectedPlayer.runs = 0;
+        selectedPlayer.runsGiven = 0;
         this.playersForTeam1.push(selectedPlayer);
       }
       else
-    {
       this.playersForTeam1 = this.playersForTeam1.filter(i => i.id !== selectedPlayer.id); //when user de-select the item
-    }
       if(selectedPlayer.isSelected && this.selectedTeam === "teamB")
       {
+        selectedPlayer.ballsPlayed = 0;
+        selectedPlayer.wicketsTaken = 0;
+        selectedPlayer.runs = 0;
+        selectedPlayer.runsGiven = 0;
         this.playersForTeam2.push(selectedPlayer);
       }
       else
-      {
         this.playersForTeam2 = this.playersForTeam2.filter(i => i.id !== selectedPlayer.id); //when user de-select the item
-      }
   }
 
   onCreateTeam()
@@ -228,7 +221,7 @@ teams : Teams = {
         }).then(loader => {
           loader.present();
           let matchNumber = (this.loadedMatches.length)+1;
-          this.match.id = 'match'+matchNumber;
+          this.match.id = 'Match'+matchNumber;
           this.match.matchStatus = {
             status : 'live',
             whoWon : '',

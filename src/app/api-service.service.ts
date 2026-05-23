@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { tap,take, switchMap, map} from 'rxjs/operators';
+import { tap,take, switchMap, map, delay} from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { Player } from './models/players';
 import { formatDate } from '@angular/common';
@@ -13,7 +13,8 @@ import { Overs } from './models/overs';
 interface PlayerData{
   name:string,
   description:string
-} 
+  imgUrl : string
+}
 
 interface MatchData{
   name : string,
@@ -63,18 +64,14 @@ teams : Teams = {
 }
 
  array: number[];
- 
+
  private _todaysPlayers = new BehaviorSubject<string>('');
  private _players = new BehaviorSubject<Player[]>([]);
- private _todaysTeams = new BehaviorSubject<Teams>(this.teams);
  private _todaysMatches = new BehaviorSubject<Match[]>([]);
- 
+
   constructor(private http:HttpClient) { }
 
-  get todaysTeams()
-  {
-    return this._todaysTeams.asObservable();
-  }
+
   get todaysMatches()
   {
     return this._todaysMatches.asObservable();
@@ -90,7 +87,7 @@ teams : Teams = {
 
   addPlayers(names : string,count: number)
   {
-    
+
   let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     const playersData = {
       "date":date,
@@ -116,7 +113,7 @@ teams : Teams = {
 
   addNewPlayerToPlayersList(newPlayer : Player)
   {
-    let generatedId : string; 
+    let generatedId : string;
    return this.http.post<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Players.json',{...newPlayer,id:null})
     .pipe(switchMap(resData => {
       console.log(resData.name)
@@ -125,31 +122,6 @@ teams : Teams = {
     }),take(1), tap(players => {
       newPlayer.id = generatedId;
       this._players.next(players.concat(newPlayer));
-    }))
-  }
-
-  addTodaysTeams(createdTeams : Teams)
-  { 
-    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
-    const urlStringforTeamA = ''+date+'/Teams'; 
-
-    // let Teams = {
-    //     "teamA" : {
-    //        "name": createdTeams.teamA.name,
-    //        "players" : createdTeams.teamA.players
-    //     },
-    //     "teamB" : {
-    //       "name": createdTeams.teamB.name,
-    //       "players" : createdTeams.team2.players
-    //     }
-    // }
-    this.teams = createdTeams;
-
-   return this.http.post<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+urlStringforTeamA+'.json',this.teams)
-    .pipe(switchMap(resData => {
-      return this._todaysTeams;
-    }),take(1), tap(teams => {
-      this._todaysTeams.next(teams);
     }))
   }
 
@@ -162,7 +134,7 @@ teams : Teams = {
         {
           if(playersData.hasOwnProperty(key))
           {
-            players.push(new Player(key,playersData[key].name,playersData[key].description))
+            players.push(new Player(key,playersData[key].name,playersData[key].description,playersData[key].imgUrl))
           }
         }
         return players;
@@ -177,8 +149,9 @@ teams : Teams = {
   {
     let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     const urlString = '/'+date+'/Matches';
-    return this.http.get<{[key : string]: MatchData}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game'+urlString+'.json').pipe(
-       map( matchesData => {
+    return this.http.get<{[key : string]: MatchData}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game'+urlString+'.json')
+    .pipe(
+    map( matchesData => {
         const matches = [];
         for(const key in matchesData)
         {
@@ -205,15 +178,17 @@ teams : Teams = {
   {
     let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     // this.match = match;
-   return this.http.put<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+date+'/Matches/'+match.id+'.json',match)
+   return this.http.put<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+date+'/Matches/'+match.id+'.json',{...match})
     .pipe(switchMap(resData => {
-      return this._todaysMatches;
-    }),take(1), tap(matches => {
+      return this.todaysMatches;
+    }),
+    take(1),
+    tap(matches => {
       this._todaysMatches.next(matches.concat(match));
     }))
   }
 
-  onUpdateBatBowlSelectionOrMatchScore(match : Match)
+  /*onUpdateBatBowlSelectionOrMatchScore(match : Match)
   {
     let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     // this.match = match;
@@ -223,6 +198,44 @@ teams : Teams = {
     }),take(1), tap(matches => {
       this._todaysMatches.next(matches.concat(match));
     }))
+  }*/
+
+  onUpdateBatBowlSelectionOrMatchScore(match : Match)
+  {
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
+    // this.match = match;
+    let updateMatches : Match[] ;
+    return this.todaysMatches.pipe(take(1),switchMap(matches => {
+      const index = matches.length-1;
+      updateMatches = [...matches];
+      updateMatches[index] = match;
+      return this.http.put<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+date+'/Matches/'+match.id+'.json',{...updateMatches[index]})
+    }),
+    tap(() => {
+      this._todaysMatches.next(updateMatches);
+    }));
+  }
+
+  getMatch(id : string)
+  {
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
+    return this.http.get<MatchData>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+date+'/Matches/'+id+'.json').pipe(
+     /* tap(resData => {
+        console.log(resData);
+      })  // use tap to view the response data */
+      map(matchData => {
+         const currentMatch : Match =
+         {
+            id : id,
+            teams : matchData.teams,
+            scoreboard : matchData.scoreboard,
+            teamOvers : matchData.teamOvers,
+            matchStatus : matchData.matchStatus
+         }
+         return currentMatch
+      })
+
+    )
   }
 
   /*get array()

@@ -1,19 +1,19 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { SelectionComponent } from './selection.component';
+import { RematchSelectionPage } from './rematch-selection.page';
 
-describe('SelectionComponent', () => {
-  let component: SelectionComponent;
-  let fixture: ComponentFixture<SelectionComponent>;
+describe('RematchSelectionPage', () => {
+  let component: RematchSelectionPage;
+  let fixture: ComponentFixture<RematchSelectionPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SelectionComponent ],
+      declarations: [ RematchSelectionPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SelectionComponent);
+    fixture = TestBed.createComponent(RematchSelectionPage);
     component = fixture.componentInstance;
   }));
 

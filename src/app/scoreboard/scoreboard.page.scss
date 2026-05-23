@@ -1,13 +1,47 @@
 ion-select {
     /* Applies to the value and placeholder color */
     color: #545ca7;
-  
+
     /* Set a different placeholder color */
     --placeholder-color: #971e49;
-  
+
     /* Set full opacity on the placeholder */
     --placeholder-opacity: 1;
   }
   .my-custom-class {
     --background: #222;
+  }
+
+  ion-tab-button
+  {
+    --background : rgb(50, 115, 235);
+    --color : rgb(255, 255, 255);
+  }
+  ion-select::part(placeholder) {
+    color: #f10606;
+    opacity: 1;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  ion-tab-button ion-label
+  {
+     font-size: 13px;
+     font-weight: bold;
+  }
+  .text-lable
+  {
+    font-size: 13px;
+  }
+  ion-label
+  {
+    margin: 0px !important;
+  }
+  ion-card
+  {
+    margin: 0px !important;
+  }
+  ion-card-title
+  {
+    --color: red;
+    font-size: 35px !important;
   }

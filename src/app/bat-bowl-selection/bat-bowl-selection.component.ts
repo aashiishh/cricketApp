@@ -69,10 +69,10 @@ export class BatBowlSelectionComponent implements OnInit {
       this.match.teams.teamA.players.forEach(player => {
            if(player.name === this.firstBatsman){
               player.onPitch = true;
+              player.isWicket = false;
           }
           else
             player.onPitch = false;
-            player.isWicket = false;
       })
     }
     else
@@ -80,10 +80,10 @@ export class BatBowlSelectionComponent implements OnInit {
         this.match.teams.teamB.players.forEach(player => {
           if(player.name === this.firstBatsman){
             player.onPitch = true;
+            player.isWicket = false;
           }
           else
             player.onPitch = false;
-            player.isWicket = false;
         })
     }
   }
@@ -115,21 +115,11 @@ export class BatBowlSelectionComponent implements OnInit {
 
   startMatch()
   {
-    /*this.modalCtrl.dismiss({
-      newMatchData : {
-        batTeam : this.batTeam,
-        bowTeam : this.bowlTeam,
-        firstBatsman : this.firstBatsman,
-        firstBowler : this.firstBowler,
-        match : this.match
-      }
-    },'confirm');*/
-      this.modalCtrl.dismiss(); 
+    this.modalCtrl.dismiss();
   }
 
   ionViewWillLeave()
   {
-    console.log(this.match)
     this.service.onUpdateBatBowlSelectionOrMatchScore(this.match).subscribe(result => {
     });
   }

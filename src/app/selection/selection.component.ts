@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActionSheetController } from '@ionic/angular';
+import { Component, Input, OnInit } from '@angular/core';
+import { ActionSheetController, LoadingController, ModalController } from '@ionic/angular';
+import { Match } from '../models/match';
+import { Player } from '../models/players';
+import { Team } from '../models/team';
 
 @Component({
     selector: 'app-selection',
@@ -8,50 +11,70 @@ import { ActionSheetController } from '@ionic/angular';
     standalone: false
 })
 export class SelectionComponent implements OnInit {
+  @Input() match : Match = {
+    id: '',
+    teams: {
+      teamA: { name: '', players: [] },
+      teamB: { name: '', players: [] }
+    },
+    scoreboard: {
+      teamA: { overs: 0, runs: 0, wickets: 0 },
+      teamB: { overs: 0, runs: 0, wickets: 0 }
+    },
+    teamOvers: { teamAOvers: undefined, teamBOvers: undefined, oversCount: 0 },
+    matchStatus: { status: '', whoWon: '', wonBy: '' }
+  };
+  winTeam : Team;
+  lostTeam : Team;
+  constructor(public actionSheetController: ActionSheetController,private loadingCtrl:LoadingController,private modalCtrl:ModalController) {}
 
-  constructor(public actionSheetController: ActionSheetController) {}
+  ngOnInit() {
+    if (!this.match?.teams) {
+      return;
+    }
 
-  async presentActionSheet() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Albums',
-      cssClass: 'my-custom-class',
-      buttons: [{
-        text: 'Delete',
-        role: 'destructive',
-        icon: 'trash',
-        handler: () => {
-          console.log('Delete clicked');
-        }
-      }, {
-        text: 'Share',
-        icon: 'share',
-        handler: () => {
-          console.log('Share clicked');
-        }
-      }, {
-        text: 'Play (open modal)',
-        icon: 'caret-forward-circle',
-        handler: () => {
-          console.log('Play clicked');
-        }
-      }, {
-        text: 'Favorite',
-        icon: 'heart',
-        handler: () => {
-          console.log('Favorite clicked');
-        }
-      }, {
-        text: 'Cancel',
-        icon: 'close',
-        role: 'cancel',
-        handler: () => {
-          console.log('Cancel clicked');
-        }
-      }]
-    });
-    await actionSheet.present();
+     let winTeamName = this.match.matchStatus.whoWon;
+     if(winTeamName !== 'NA')
+     {
+
+     if(this.match.teams.teamA.name === winTeamName){
+      this.winTeam = this.match.teams.teamA;
+      this.lostTeam = this.match.teams.teamB;
+     }
+      else
+      {
+        this.winTeam = this.match.teams.teamB;
+        this.lostTeam = this.match.teams.teamA;
+      }
+    }
+    else
+    {
+        this.winTeam = this.match.teams.teamA;
+        this.lostTeam = this.match.teams.teamB;
+    }
+    this.winTeam.players.forEach(player => {
+      console.log(player.isWicket)
+    })
+    this.lostTeam.players.forEach(player => {
+      console.log(player.isWicket)
+    })
+
   }
+  ionViewWillEnter() {
 
-  ngOnInit() {}
+    this.loadingCtrl.create({
+      message: 'getting match details...'
+    }).then(loader => {
+      loader.present();
+      setTimeout(()=>{
+        loader.dismiss();
+      },1000)
+    })
+
+  }
+  close()
+  {
+    this.modalCtrl.dismiss();
+  }
 
 }

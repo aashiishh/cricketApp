@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ActionSheetController, IonSelect, LoadingController, ModalController, PopoverController, ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { ActionSheetController, AlertController, IonSelect, LoadingController, ModalController, PopoverController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ApiServiceService } from '../api-service.service';
 import { Ball } from '../models/ball';
 import { Match } from '../models/match';
-import { Overs } from '../models/overs';
+import { Player } from '../models/players';
 import { Scoreboard } from '../models/scoreboard';
 import { Team } from '../models/team';
 import { TeamOvers } from '../models/teamOvers';
@@ -23,8 +23,8 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   loadedMatches: Match[] = [];
   displayMessage : string = '';
   currentPopover = null;
-  batsman: string = '';             // to display current batsman
-  bowler: string = '';             // to display current bowler
+  batsman: Player = {id : '',name: ''};             // to display current batsman
+  bowler: Player = {id : '',name: ''};             // to display current bowler
   teamABat: boolean = false;       // true if teamA is Batting
   teamBBat: boolean = false;      // true if teamB is Batting
   bowlingTeam: Team = {
@@ -70,7 +70,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   }
   isLoading: boolean = false;
   private matchSub: Subscription;
-  constructor(private modalCtrl: ModalController,private actionSheetController: ActionSheetController, private toastCtrl: ToastController, private service: ApiServiceService, private loadingCtrl: LoadingController,public popoverController: PopoverController,private router:Router) {}
+  constructor(private alertController:AlertController,private modalCtrl: ModalController,private actionSheetController: ActionSheetController, private toastCtrl: ToastController, private service: ApiServiceService, private loadingCtrl: LoadingController,public popoverController: PopoverController,private router:Router) {}
 
   ngOnInit() {
     this.matchSub = this.service.todaysMatches.subscribe(matches => {
@@ -85,31 +85,29 @@ export class ScoreboardPage implements OnInit, OnDestroy {
           this.battingTeam = this.currentMatch.teams.teamA;
           this.battingTeam.players.forEach(player => {
             if (player.onPitch && !player.isWicket)
-              this.batsman = player.name;
+              this.batsman = player;
           })
-          console.log('Batsman - ', this.batsman)
+
           this.bowlingTeam = this.currentMatch.teams.teamB;
           this.bowlingTeam.players.forEach(player => {
             if (player.onPitch)
-              this.bowler = player.name;
+              this.bowler = player;
           })
-          console.log('Bowler - ', this.bowler)
+
         }
         if (this.currentMatch.teams.teamB.currentStatus === 'bat') {
           this.teamBBat = true;
           this.teamABat = false;
           this.battingTeam = this.currentMatch.teams.teamB;
           this.battingTeam.players.forEach(player => {
-            if (player.onPitch)
-              this.batsman = player.name;
+            if (player.onPitch && !player.isWicket)
+              this.batsman = player;
           })
-          console.log('Batsman - ', this.batsman)
           this.bowlingTeam = this.currentMatch.teams.teamA;
           this.bowlingTeam.players.forEach(player => {
             if (player.onPitch)
-              this.bowler = player.name;
+              this.bowler = player;
           })
-          console.log('Bowler - ', this.bowler)
         }
       }
     })
@@ -138,23 +136,25 @@ export class ScoreboardPage implements OnInit, OnDestroy {
 
   onBallDone(runs: number, status: string) {
     const ball: Ball = {
-      baller: this.bowler,
-      batsman: this.batsman,
+      baller: this.bowler.name,
+      batsman: this.batsman.name,
       run: runs+'',
       status: status
     }
-
+    this.bowler.runsGiven += runs;
     if (this.teamABat) {
       this.scoreboard.teamA.runs = this.scoreboard.teamA.runs + runs;
       if (status === 'runs' || status === 'dot' || status === 'iopa')
-      this.scoreboard.teamA.balls++;
+      {this.scoreboard.teamA.balls++;
+      this.batsman.ballsPlayed++;
+    this.batsman.runs += runs;
+}
       if(this.teamOvers.teamAOvers.currentBall === 0)
       this.teamOvers.teamAOvers.overs[this.teamOvers.teamAOvers.currentOver].balls[0] = ball;
       else
       this.teamOvers.teamAOvers.overs[this.teamOvers.teamAOvers.currentOver].balls.push(ball);
       this.teamOvers.teamAOvers.currentBall++;
-      console.log(this.currentMatch)
-      if (this.scoreboard.teamA.balls === 6) 
+      if (this.scoreboard.teamA.balls === 6)
           this.afterSixBalls(false);  //if 6 balls done
       else {
         if(this.currentMatch.teams.teamA.bat_bowl_first === 'bowl')
@@ -190,13 +190,15 @@ export class ScoreboardPage implements OnInit, OnDestroy {
     if (this.teamBBat) {
       this.scoreboard.teamB.runs = this.scoreboard.teamB.runs + runs;
    if (status === 'runs' || status === 'dot' || status === 'iopa')
-     this.scoreboard.teamB.balls++;
+    { this.scoreboard.teamB.balls++;
+     this.batsman.ballsPlayed++;
+     this.batsman.runs += runs;
+    }
      if(this.teamOvers.teamBOvers.currentBall === 0)
      this.teamOvers.teamBOvers.overs[this.teamOvers.teamBOvers.currentOver].balls[0] = ball;
      else
      this.teamOvers.teamBOvers.overs[this.teamOvers.teamBOvers.currentOver].balls.push(ball);
      this.teamOvers.teamBOvers.currentBall++;
-     console.log(this.currentMatch)
       if (this.scoreboard.teamB.balls === 6)
         this.afterSixBalls(false);  //if 6 balls done
       else {
@@ -249,13 +251,14 @@ export class ScoreboardPage implements OnInit, OnDestroy {
         else if (value)
           this.presentActionSheet();
       });
+      this.bowler.wicketsTaken++;
       this.wicketType.value = "";
     }
   }
   onBowled(status: string) {
     const ball: Ball = {
-      baller: this.bowler,
-      batsman: this.batsman,
+      baller: this.bowler.name,
+      batsman: this.batsman.name,
       run: '0',
       status: 'wicket',
       wicket_type: ''
@@ -270,13 +273,14 @@ export class ScoreboardPage implements OnInit, OnDestroy {
 
       this.scoreboard.teamA.wickets += 1;
       this.scoreboard.teamA.balls += 1;
+      this.batsman.ballsPlayed++;
       if(this.teamOvers.teamAOvers.currentBall === 0)
       this.teamOvers.teamAOvers.overs[this.teamOvers.teamAOvers.currentOver].balls[0] = ball;
       else
       this.teamOvers.teamAOvers.overs[this.teamOvers.teamAOvers.currentOver].balls.push(ball);
       this.teamOvers.teamAOvers.currentBall++;
 
-      if (this.scoreboard.teamA.balls === 6) 
+      if (this.scoreboard.teamA.balls === 6)
         this.afterSixBalls(true); //wicket on last ball of over
       else {
         this.service.onUpdateBatBowlSelectionOrMatchScore(this.currentMatch).subscribe(() => { })
@@ -286,6 +290,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
     if (this.teamBBat) {
       this.scoreboard.teamB.wickets += 1;
       this.scoreboard.teamB.balls += 1;
+      this.batsman.ballsPlayed++;
       if(this.teamOvers.teamBOvers.currentBall === 0)
       this.teamOvers.teamBOvers.overs[this.teamOvers.teamBOvers.currentOver].balls[0] = ball;
       else
@@ -301,8 +306,8 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   }
   ondidCatch(caughtBy: string) {
     const ball: Ball = {
-      baller: this.bowler,
-      batsman: this.batsman,
+      baller: this.bowler.name,
+      batsman: this.batsman.name,
       run: '0',
       status: 'wicket',
       wicket_type: 'caught and bowled',
@@ -313,6 +318,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
     if (this.teamABat) {
       this.scoreboard.teamA.wickets += 1;
       this.scoreboard.teamA.balls += 1;
+      this.batsman.ballsPlayed++;
       if(this.teamOvers.teamAOvers.currentBall === 0)
       this.teamOvers.teamAOvers.overs[this.teamOvers.teamAOvers.currentOver].balls[0] = ball;
       else
@@ -328,6 +334,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
     if (this.teamBBat) {
       this.scoreboard.teamB.wickets += 1;
       this.scoreboard.teamB.balls += 1;
+      this.batsman.ballsPlayed++;
       if(this.teamOvers.teamBOvers.currentBall === 0)
       this.teamOvers.teamBOvers.overs[this.teamOvers.teamBOvers.currentOver].balls[0] = ball;
       else
@@ -367,32 +374,32 @@ export class ScoreboardPage implements OnInit, OnDestroy {
 
   createButtonsForOver() {
     let buttons = [];
+
     for (var index in this.bowlingTeam.players) {
-      let name = this.bowlingTeam.players[index].name;
-      if (!this.bowlingTeam.players[index].onPitch) {
+      let player = this.bowlingTeam.players[index];
+      if (!player.onPitch) {
         let button = {
-          text: name,
-          // icon: this.possibleButtons[index].icon,
+          text: player.name,
           handler: () => {
             if (!this.teamABat) {
-              this.currentMatch.teams.teamA.players.forEach(player => {
-                if (player.name === name){
-                  player.onPitch = true;
+              this.currentMatch.teams.teamA.players.forEach(p => {
+                if (p.name === player.name){
+                  p.onPitch = true;
                 }
-                if(this.bowler === player.name)
-                  player.onPitch = false;
+                if(this.bowler.name === p.name)
+                  p.onPitch = false;
               })
             }
             if (!this.teamBBat) {
-              this.currentMatch.teams.teamB.players.forEach(player => {
-                if (player.name === name){
-                  player.onPitch = true;
+              this.currentMatch.teams.teamB.players.forEach(p => {
+                if (p.name === player.name){
+                  p.onPitch = true;
                 }
-                if(this.bowler === player.name)
-                  player.onPitch = false;
+                if(this.bowler.name === p.name)
+                  p.onPitch = false;
               })
             }
-            this.bowler = name;
+            this.bowler = player;
             this.service.onUpdateBatBowlSelectionOrMatchScore(this.currentMatch).subscribe(() => { })
           }
         }
@@ -406,34 +413,36 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   createButtonsForBatsmanSelectionAfterSwitch() {
     let buttons = [];
     for (var index in this.battingTeam.players) {
-      let name = this.battingTeam.players[index].name;
-      if (!this.battingTeam.players[index].onPitch && !this.battingTeam.players[index].isWicket) {  //displaying only those batsman whose onPitch is false(i.e not yet batted)
+      let player = this.battingTeam.players[index];
+      if (!player.onPitch && !player.isWicket) {  //displaying only those batsman whose onPitch is false(i.e not yet batted)
         let button = {
-          text: name,
+          text: player.name,
           // icon: this.possibleButtons[index].icon,
           handler: () => {
             // this.battingTeam.players[index].onPitch=true;
             if (this.teamABat) {
-              this.currentMatch.teams.teamA.players.forEach(player => {
-                if (player.name === name)
-                  player.onPitch = true;
-                if (this.batsman === player.name) {
-                  player.onPitch = false;
-                  console.log(player.name, "got false")
+              this.currentMatch.teams.teamA.players.forEach(p => {
+                if (p.name === player.name){
+                  p.onPitch = true;
+                  p.isWicket = false;
+                }
+                if (this.batsman.name === p.name) {
+                  p.onPitch = false;
                 }
               })
             }
             if (this.teamBBat) {
-              this.currentMatch.teams.teamB.players.forEach(player => {
-                if (player.name === name)
-                  player.onPitch = true;
-                if (this.batsman === player.name) {
-                  player.onPitch = false;
-                  console.log(player.name, "got false")
+              this.currentMatch.teams.teamB.players.forEach(p => {
+                if (p.name === player.name){
+                  p.onPitch = true;
+                  p.isWicket = false;
+                }
+                if (this.batsman.name === p.name) {
+                  p.onPitch = false;
                 }
               })
             }
-            this.batsman = name;
+            this.batsman = player;
             this.service.onUpdateBatBowlSelectionOrMatchScore(this.currentMatch).subscribe(() => { })
           }
         }
@@ -446,23 +455,22 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   createButtonsForBatsmanSelectionAfterWicket(ifLastBall: boolean,isDismiss : boolean) {  //ifLastBall true when wicket on last ball
     let buttons = [];
     for (var index in this.battingTeam.players) {
-      let name = this.battingTeam.players[index].name;
-      if (!this.battingTeam.players[index].onPitch && !this.battingTeam.players[index].isWicket) {  //displaying only those batsman whose onPitch is false(i.e not yet batted)
+      let player = this.battingTeam.players[index];
+      if (!player.onPitch && !player.isWicket) {  //displaying only those batsman whose onPitch is false(i.e not yet batted)
         let button = {
-          text: name,
+          text: player.name,
           // icon: this.possibleButtons[index].icon,
           handler: () => {
 
             if (this.teamABat) {
-              this.currentMatch.teams.teamA.players.forEach(player => {
-                if (player.name === name){
-                  player.onPitch = true;
-                  player.isWicket = false;
+              this.currentMatch.teams.teamA.players.forEach(p => {
+                if (p.name === player.name){
+                  p.onPitch = true;
+                  p.isWicket = false;
                 }
-                if (this.batsman === player.name) {
-                  player.onPitch = false;
-                  player.isWicket = true;
-                  
+                if (this.batsman.name === p.name) {  // setting current Batsman as out
+                  p.onPitch = false;
+                  p.isWicket = true;
                 }
               })
               if(isDismiss){
@@ -470,22 +478,22 @@ export class ScoreboardPage implements OnInit, OnDestroy {
               }
             }
             if (this.teamBBat) {
-              this.currentMatch.teams.teamB.players.forEach(player => {
-                if (player.name === name){
-                  player.onPitch = true;
-                  player.isWicket = false;
+              this.currentMatch.teams.teamB.players.forEach(p => {
+                if (p.name === player.name){
+                  p.onPitch = true;
+                  p.isWicket = false;
                 }
-                if (this.batsman === player.name) {
-                  player.onPitch = false;
-                  player.isWicket = true;
-                  
+                if (this.batsman.name === p.name) {
+                  p.onPitch = false;
+                  p.isWicket = true;
+
                 }
               })
               if(isDismiss){
                this.scoreboard.teamB.wickets++;
               }
             }
-            this.batsman = name;
+            this.batsman = player;
             this.service.onUpdateBatBowlSelectionOrMatchScore(this.currentMatch).subscribe(() => { })
             if (ifLastBall) {
               this.toastCtrl.create({
@@ -530,7 +538,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
           });
           await actionSheet.present();
         }
-         
+
     }
     else
     {
@@ -546,7 +554,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
         await actionSheet.present();
       }
     }
-    
+
   }
 
   async presnetActionSheetForOver() {
@@ -556,12 +564,12 @@ export class ScoreboardPage implements OnInit, OnDestroy {
       buttons: this.createButtonsForOver()
     });
     await actionSheet.present();
-  
+
   }
 
   onOverCompleted() {
 
-    // let over: Over = { balls: [] };
+    let finishMatch : boolean = false;
     if (this.teamABat) {
 
       if(this.currentMatch.teams.teamA.bat_bowl_first === 'bowl')
@@ -587,6 +595,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
             displayMessage = "Team "+name+" has won the Match by "+1+" wicket";
             }
             this.endLoading(displayMessage);
+            finishMatch = true;
           }
       }
       this.teamOvers.teamAOvers.currentOver++;
@@ -594,7 +603,6 @@ export class ScoreboardPage implements OnInit, OnDestroy {
       this.scoreboard.teamA.balls = 0;
       this.teamOvers.teamAOvers.currentBall = 0;
       this.service.onUpdateBatBowlSelectionOrMatchScore(this.currentMatch).subscribe(() => { })
-      
     }
     if (this.teamBBat) {
       if(this.currentMatch.teams.teamB.bat_bowl_first === 'bowl')
@@ -620,7 +628,8 @@ export class ScoreboardPage implements OnInit, OnDestroy {
               displayMessage = "Team "+name+" has won the Match by "+1+" wicket";
               }
               this.endLoading(displayMessage);
-            }    
+              finishMatch = true;
+            }
         }
       this.teamOvers.teamBOvers.currentOver++;
       this.scoreboard.teamB.overs = this.teamOvers.teamBOvers.currentOver;
@@ -628,11 +637,14 @@ export class ScoreboardPage implements OnInit, OnDestroy {
       this.teamOvers.teamBOvers.currentBall = 0;
       this.service.onUpdateBatBowlSelectionOrMatchScore(this.currentMatch).subscribe(() => { })
     }
+    return finishMatch;
   }
 
   afterSixBalls(ifLastBall: boolean) {
-    this.onOverCompleted(); // doing changes for over completion
-    if (this.teamABat && this.teamOvers.teamAOvers.currentOver === this.teamOvers.oversCount) 
+    const check = this.onOverCompleted(); // doing changes for over completion
+    if(!check)
+    {
+    if (this.teamABat && this.teamOvers.teamAOvers.currentOver === this.teamOvers.oversCount)
         this.onSwtich(false)
     else if(this.teamBBat && this.teamOvers.teamBOvers.currentOver === this.teamOvers.oversCount)
           this.onSwtich(false)
@@ -652,6 +664,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
         })
       })
       }
+    }
     }
   }
 
@@ -675,18 +688,23 @@ export class ScoreboardPage implements OnInit, OnDestroy {
           case 'sb':
             this.presnetActionSheetForBatsmanSelectionAfterSwitch();
             break;
-         /* case 'oc':
-            this.onSwtich(false);
-            break;*/
+          case 'cb':
+            this.presnetActionSheetForOver();
+            break;
             case 'db':
               this.presnetActionSheetForBatsmanSelectionAfterWicket(false,true);
-              break;  
+              break;
         }
     }
   }
   finishMatch()
   {
     this.router.navigateByUrl('/home');
+  }
+  restartMatch()
+  {
+    this.router.navigateByUrl('/rematch-selection');
+    this.displayMessage = "";
   }
   onSwtich(ifWickets : boolean)
   {
@@ -735,15 +753,16 @@ export class ScoreboardPage implements OnInit, OnDestroy {
         message = 'All Out!!,Switching sides...'
     else
         message = 'All Overs Done,Switching sides...'
-    
+
     this.loadingCtrl.create({
       message: message
     }).then(loader => {
       loader.present();
-   
+
     setTimeout(()=> {
       loader.dismiss();
     },3500)
+
       loader.onDidDismiss().then(() => {
         this.modalCtrl.create({
           component: SwitchDisplayComponent,
@@ -762,7 +781,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
       message: "please wait..."
     }).then(loader => {
       loader.present();
-   
+
     setTimeout(()=> {
       loader.dismiss();
     },3500)
@@ -775,5 +794,66 @@ export class ScoreboardPage implements OnInit, OnDestroy {
     if (this.matchSub)
       this.matchSub.unsubscribe();
   }
+  /*async presentAlertRadio() {
+    const alert = await this.alertController.create({
+      header: 'Radio',
+      inputs: [
+        {
+          name: 'radio1',
+          type: 'radio',
+          label: 'Radio 1',
+          value: 'value1',
+          checked: true
+        },
+        {
+          name: 'radio2',
+          type: 'radio',
+          label: 'Radio 2',
+          value: 'value2'
+        },
+        {
+          name: 'radio3',
+          type: 'radio',
+          label: 'Radio 3',
+          value: 'value3'
+        },
+        {
+          name: 'radio4',
+          type: 'radio',
+          label: 'Radio 4',
+          value: 'value4'
+        },
+        {
+          name: 'radio5',
+          type: 'radio',
+          label: 'Radio 5',
+          value: 'value5'
+        },
+        {
+          name: 'radio6',
+          type: 'radio',
+          label: 'Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 Radio 6 ',
+          value: 'value6'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
+          }
+        }, {
+          text: 'Ok',
+          handler: () => {
+            console.log('Confirm Ok');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }*/
 
 }

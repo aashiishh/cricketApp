@@ -17,10 +17,10 @@ export class HomePage implements OnInit,OnDestroy {
   currentMatchStatus : string = undefined;
   private matchSub : Subscription;
    //https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/29052021
-  constructor(private loadingCtrl:LoadingController,private toastCtrl:ToastController,public actionSheetController: ActionSheetController,private apiService:ApiServiceService) {
+  constructor(private loadingCtrl:LoadingController,private toastCtrl:ToastController,private apiService:ApiServiceService) {
 
   }
-  
+
  ngOnInit() {
   console.log('1. home_init');
   this.matchSub = this.apiService.todaysMatches.subscribe(matches => {
@@ -62,18 +62,6 @@ export class HomePage implements OnInit,OnDestroy {
     }).then(toast => {
       toast.present();
     })
-  }
-
-  showResults()
-  {
-       this.toastCtrl.create({
-              message: 'Sorry!! Under Development',
-              color: 'danger',
-              position: 'bottom',
-              duration: 1500
-            }).then(toast => {
-              toast.present();
-            })
   }
 
   ngOnDestroy()

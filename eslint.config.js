@@ -54,6 +54,7 @@ module.exports = defineConfig([
     ],
     rules: {
       "@angular-eslint/template/alt-text": "off",
+      "@angular-eslint/template/prefer-control-flow": "off",
     },
   }
 ]);
