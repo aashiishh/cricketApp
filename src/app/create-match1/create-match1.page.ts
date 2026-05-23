@@ -15,9 +15,10 @@ import { Team } from '../models/team';
 import { Teams } from '../models/teams';
 
 @Component({
-  selector: 'app-create-match1',
-  templateUrl: './create-match1.page.html',
-  styleUrls: ['./create-match1.page.scss'],
+    selector: 'app-create-match1',
+    templateUrl: './create-match1.page.html',
+    styleUrls: ['./create-match1.page.scss'],
+    standalone: false
 })
 export class CreateMatch1Page implements OnInit,OnDestroy {
 

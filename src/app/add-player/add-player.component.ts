@@ -3,9 +3,10 @@ import { NgForm } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-add-player',
-  templateUrl: './add-player.component.html',
-  styleUrls: ['./add-player.component.scss'],
+    selector: 'app-add-player',
+    templateUrl: './add-player.component.html',
+    styleUrls: ['./add-player.component.scss'],
+    standalone: false
 })
 export class AddPlayerComponent implements OnInit {
   @ViewChild('f', {static: true}) form: NgForm;

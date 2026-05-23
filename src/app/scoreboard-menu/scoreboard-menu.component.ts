@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-scoreboard-menu',
-  templateUrl: './scoreboard-menu.component.html',
-  styleUrls: ['./scoreboard-menu.component.scss'],
+    selector: 'app-scoreboard-menu',
+    templateUrl: './scoreboard-menu.component.html',
+    styleUrls: ['./scoreboard-menu.component.scss'],
+    standalone: false
 })
 export class ScoreboardMenuComponent implements OnInit {
 

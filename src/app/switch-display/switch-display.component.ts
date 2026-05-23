@@ -2,19 +2,35 @@ import { Component, Input, OnInit } from '@angular/core';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { ApiServiceService } from '../api-service.service';
 import { Match } from '../models/match';
-import { Team } from '../models/team';
+import { Player } from '../models/players';
 
 @Component({
-  selector: 'app-switch-display',
-  templateUrl: './switch-display.component.html',
-  styleUrls: ['./switch-display.component.scss'],
+    selector: 'app-switch-display',
+    templateUrl: './switch-display.component.html',
+    styleUrls: ['./switch-display.component.scss'],
+    standalone: false
 })
 export class SwitchDisplayComponent implements OnInit {
   @Input() teams: {
-    battingTeam: Team,
-    bowlingTeam: Team
+    battingTeam: Player[],
+    bowlingTeam: Player[]
+  } = {
+    battingTeam: [],
+    bowlingTeam: []
   }
-  @Input() match : Match;
+  @Input() match : Match = {
+    id: '',
+    teams: {
+      teamA: { name: '', players: [] },
+      teamB: { name: '', players: [] }
+    },
+    scoreboard: {
+      teamA: { overs: 0, runs: 0, wickets: 0 },
+      teamB: { overs: 0, runs: 0, wickets: 0 }
+    },
+    teamOvers: { teamAOvers: undefined, teamBOvers: undefined, oversCount: 0 },
+    matchStatus: { status: '', whoWon: '', wonBy: '' }
+  };
   firstBatsman: string;
   firstBowler: string;
   constructor(private modalCtrl: ModalController,private loadingCtrl:LoadingController,private service:ApiServiceService) {

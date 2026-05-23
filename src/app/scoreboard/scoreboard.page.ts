@@ -1,4 +1,3 @@
-import { stringify } from '@angular/compiler/src/util';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActionSheetController, IonSelect, LoadingController, ModalController, PopoverController, ToastController } from '@ionic/angular';
@@ -14,9 +13,10 @@ import { ScoreboardMenuComponent } from '../scoreboard-menu/scoreboard-menu.comp
 import { SwitchDisplayComponent } from '../switch-display/switch-display.component';
 
 @Component({
-  selector: 'app-scoreboard',
-  templateUrl: './scoreboard.page.html',
-  styleUrls: ['./scoreboard.page.scss'],
+    selector: 'app-scoreboard',
+    templateUrl: './scoreboard.page.html',
+    styleUrls: ['./scoreboard.page.scss'],
+    standalone: false
 })
 export class ScoreboardPage implements OnInit, OnDestroy {
   @ViewChild('wt', { static: false }) wicketType: IonSelect;
@@ -60,10 +60,13 @@ export class ScoreboardPage implements OnInit, OnDestroy {
   }
   currentMatch: Match = {
     id: '',
-    teams: undefined,
-    scoreboard: undefined,
+    teams: {
+      teamA: { name: '', currentStatus: '', players: [] },
+      teamB: { name: '', currentStatus: '', players: [] }
+    },
+    scoreboard: this.scoreboard,
     teamOvers: this.teamOvers,
-    matchStatus: undefined
+    matchStatus: { status: '', whoWon: '', wonBy: '' }
   }
   isLoading: boolean = false;
   private matchSub: Subscription;
@@ -71,7 +74,7 @@ export class ScoreboardPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.matchSub = this.service.todaysMatches.subscribe(matches => {
-      if (matches) {
+      if (matches && matches.length > 0) {
         this.loadedMatches = matches;
         this.currentMatch = this.loadedMatches[this.loadedMatches.length - 1];
         this.teamOvers = this.currentMatch.teamOvers;

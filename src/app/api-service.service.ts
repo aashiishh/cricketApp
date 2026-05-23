@@ -3,7 +3,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { tap,take, switchMap, map} from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { Player } from './models/players';
-import { DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { Teams } from './models/teams';
 import { Scoreboard } from './models/scoreboard';
 import { Team } from './models/team';
@@ -69,7 +69,7 @@ teams : Teams = {
  private _todaysTeams = new BehaviorSubject<Teams>(this.teams);
  private _todaysMatches = new BehaviorSubject<Match[]>([]);
  
-  constructor(private http:HttpClient,private datepipe:DatePipe) { }
+  constructor(private http:HttpClient) { }
 
   get todaysTeams()
   {
@@ -91,7 +91,7 @@ teams : Teams = {
   addPlayers(names : string,count: number)
   {
     
-  let date =this.datepipe.transform(new Date(), 'ddMMyyyy');
+  let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     const playersData = {
       "date":date,
       "names":names,
@@ -104,7 +104,7 @@ teams : Teams = {
 
   getTodaysPlayers()
   {
-    let date =this.datepipe.transform(new Date(), 'ddMMyyyy');
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     return this.http.get<any>('http://13.232.50.107:8009/getplayers/'+date).pipe(
       map(playersObj => {
         return playersObj.names;
@@ -130,7 +130,7 @@ teams : Teams = {
 
   addTodaysTeams(createdTeams : Teams)
   { 
-    let date =this.datepipe.transform(new Date(), 'ddMMyyyy');
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     const urlStringforTeamA = ''+date+'/Teams'; 
 
     // let Teams = {
@@ -175,7 +175,7 @@ teams : Teams = {
 
   fetchTodaysMatchesList()
   {
-    let date =this.datepipe.transform(new Date(), 'ddMMyyyy');
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     const urlString = '/'+date+'/Matches';
     return this.http.get<{[key : string]: MatchData}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game'+urlString+'.json').pipe(
        map( matchesData => {
@@ -203,7 +203,7 @@ teams : Teams = {
 
   onMatchCreated(match : Match)
   {
-    let date =this.datepipe.transform(new Date(), 'ddMMyyyy'); 
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     // this.match = match;
    return this.http.put<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+date+'/Matches/'+match.id+'.json',match)
     .pipe(switchMap(resData => {
@@ -215,7 +215,7 @@ teams : Teams = {
 
   onUpdateBatBowlSelectionOrMatchScore(match : Match)
   {
-    let date =this.datepipe.transform(new Date(), 'ddMMyyyy'); 
+    let date = formatDate(new Date(), 'ddMMyyyy', 'en-US');
     // this.match = match;
    return this.http.put<{name : string}>('https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/'+date+'/Matches/'+match.id+'.json',match)
     .pipe(switchMap(resData => {

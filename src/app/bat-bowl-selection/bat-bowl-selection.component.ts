@@ -4,16 +4,27 @@ import { ModalController } from '@ionic/angular';
 import { ApiServiceService } from '../api-service.service';
 import { Match } from '../models/match';
 import { Player } from '../models/players';
-import { Team } from '../models/team';
-import { Teams } from '../models/teams';
 
 @Component({
-  selector: 'app-bat-bowl-selection',
-  templateUrl: './bat-bowl-selection.component.html',
-  styleUrls: ['./bat-bowl-selection.component.scss'],
+    selector: 'app-bat-bowl-selection',
+    templateUrl: './bat-bowl-selection.component.html',
+    styleUrls: ['./bat-bowl-selection.component.scss'],
+    standalone: false
 })
 export class BatBowlSelectionComponent implements OnInit {
-  @Input() match : Match;
+  @Input() match : Match = {
+    id: '',
+    teams: {
+      teamA: { name: '', players: [] },
+      teamB: { name: '', players: [] }
+    },
+    scoreboard: {
+      teamA: { overs: 0, runs: 0, wickets: 0 },
+      teamB: { overs: 0, runs: 0, wickets: 0 }
+    },
+    teamOvers: { teamAOvers: undefined, teamBOvers: undefined, oversCount: 0 },
+    matchStatus: { status: '', whoWon: '', wonBy: '' }
+  };
   batTeam : string;
   bowlTeam : string;
   dispTeamForBat : Player[];

@@ -5,9 +5,10 @@ import { ApiServiceService } from '../api-service.service';
 import { Match } from '../models/match';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+    selector: 'app-home',
+    templateUrl: 'home.page.html',
+    styleUrls: ['home.page.scss'],
+    standalone: false
 })
 export class HomePage implements OnInit,OnDestroy {
   matchStatus : string = 'new';
