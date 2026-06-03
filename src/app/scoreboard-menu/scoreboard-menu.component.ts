@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
 
 @Component({
@@ -8,6 +8,8 @@ import { PopoverController } from '@ionic/angular';
     standalone: false
 })
 export class ScoreboardMenuComponent implements OnInit {
+  @Input() canManageMatches = false;
+  @Input() canScoreMatch = false;
 
   constructor(public popoverController: PopoverController) { }
 

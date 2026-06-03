@@ -1,0 +1,111 @@
+.set-profile-page {
+  --padding-bottom: 24px;
+}
+
+.set-profile-shell {
+  align-items: center;
+  display: grid;
+  min-height: 100%;
+  padding: 16px;
+}
+
+.profile-card {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 560px;
+  padding: 22px;
+  width: 100%;
+}
+
+.profile-card > span {
+  color: var(--cricket-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.profile-card h1 {
+  color: var(--cricket-text);
+  font-size: clamp(2.2rem, 9vw, 4rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.95;
+  margin: 0;
+}
+
+.profile-card p {
+  color: var(--cricket-muted);
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.profile-form {
+  display: grid;
+  gap: 14px;
+}
+
+.photo-panel {
+  align-items: center;
+  background: var(--cricket-surface-strong);
+  border: 1px solid var(--cricket-line);
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  padding: 14px;
+}
+
+.photo-preview {
+  align-items: center;
+  background: #dbeafe;
+  border: 1px solid var(--cricket-line);
+  border-radius: 50%;
+  color: var(--cricket-accent);
+  display: grid;
+  flex: 0 0 86px;
+  height: 86px;
+  overflow: hidden;
+  place-items: center;
+  width: 86px;
+}
+
+.photo-preview img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.photo-preview ion-icon {
+  font-size: 70px;
+}
+
+.photo-action {
+  --border-radius: 8px;
+  font-weight: 900;
+  text-transform: none;
+}
+
+.profile-input {
+  --background: var(--cricket-surface-strong);
+  --border-radius: 8px;
+  --highlight-color-focused: var(--cricket-accent);
+  border: 1px solid var(--cricket-line);
+  border-radius: 8px;
+}
+
+.profile-input ion-label {
+  color: var(--cricket-text);
+  font-weight: 900;
+}
+
+@media (max-width: 420px) {
+  .photo-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .photo-preview {
+    margin: 0 auto;
+  }
+}

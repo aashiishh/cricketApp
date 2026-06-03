@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar class="cricket-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/my-profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Set Player Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cricket-page set-profile-page">
+  <main class="set-profile-shell">
+    <section class="profile-card cricket-card">
+      <span>First step</span>
+      <h1>Your Player Profile</h1>
+      <p>This profile connects your login account with your cricket career records.</p>
+
+      <form #profileForm="ngForm" (ngSubmit)="saveProfile()" class="profile-form">
+        <div class="photo-panel">
+          <div class="photo-preview">
+            <img *ngIf="photoPreview" [src]="photoPreview" alt="Player photo">
+            <ion-icon *ngIf="!photoPreview" name="person-circle-outline"></ion-icon>
+          </div>
+          <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)">
+          <ion-button type="button" fill="solid" class="photo-action" (click)="photoInput.click()">
+            <ion-icon slot="start" name="camera-outline"></ion-icon>
+            {{photoPreview ? 'Change Photo' : 'Upload Photo'}}
+          </ion-button>
+        </div>
+
+        <ion-item lines="none" class="profile-input">
+          <ion-label position="stacked">Name*</ion-label>
+          <ion-input name="name" [(ngModel)]="name" required placeholder="Enter player name"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="profile-input">
+          <ion-label position="stacked">Cricket Role</ion-label>
+          <ion-input name="role" [(ngModel)]="role" placeholder="Batsman, Bowler, All rounder"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="profile-input">
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input type="email" name="email" [(ngModel)]="email" placeholder="you@example.com"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="profile-input">
+          <ion-label position="stacked">Phone</ion-label>
+          <ion-input type="tel" name="phone" [(ngModel)]="phone" placeholder="+91 9876543210"></ion-input>
+        </ion-item>
+
+        <ion-button class="primary-action" type="submit" expand="block" [disabled]="!profileForm.valid">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Save Profile
+        </ion-button>
+      </form>
+    </section>
+  </main>
+</ion-content>

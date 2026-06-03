@@ -1,0 +1,242 @@
+<ion-header>
+  <ion-toolbar class="cricket-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Player Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cricket-page player-profile-page">
+  <main class="profile-shell">
+    <section class="matches-panel cricket-card player-search-panel">
+      <div class="section-title">
+        <h2>Find Player</h2>
+        <span>ID, name, or role</span>
+      </div>
+      <ion-item class="player-picker" lines="none">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        <ion-input [(ngModel)]="searchTerm" placeholder="Search players"></ion-input>
+      </ion-item>
+      <div class="match-list" *ngIf="!selectedPlayer || searchTerm">
+        <button class="match-record player-result" type="button" *ngFor="let player of filteredPlayers" (click)="viewPlayer(player)">
+          <div class="match-main">
+            <ion-avatar>
+              <img *ngIf="player.imgUrl" [src]="player.imgUrl" (error)="player.imgUrl = ''">
+              <ion-icon *ngIf="!player.imgUrl" name="person-circle-outline"></ion-icon>
+            </ion-avatar>
+            <div>
+              <h3>{{player.name}}</h3>
+              <p>{{player.description || 'Cricket player'}} - {{player.id}}</p>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div class="no-records" *ngIf="!isLoading && filteredPlayers.length === 0">
+        <ion-icon name="search-outline"></ion-icon>
+        <p>No players match your search.</p>
+      </div>
+    </section>
+
+    <section class="profile-hero cricket-card" *ngIf="selectedPlayer">
+      <div class="player-identity">
+        <ion-avatar>
+          <img *ngIf="selectedPlayer.imgUrl" [src]="selectedPlayer.imgUrl" (error)="selectedPlayer.imgUrl = ''">
+          <ion-icon *ngIf="!selectedPlayer.imgUrl" name="person-circle-outline"></ion-icon>
+        </ion-avatar>
+        <div>
+          <span>Career Profile</span>
+          <h1>{{selectedPlayer.name}}</h1>
+          <p>{{selectedPlayer.description || 'Cricket player'}}</p>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <ion-button *ngIf="canDeleteSelectedPlayer" fill="outline" color="danger" (click)="confirmDeletePlayer()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Delete Player
+        </ion-button>
+      </div>
+
+      <div class="hero-stats">
+        <div>
+          <span>Matches</span>
+          <strong>{{stats.matches}}</strong>
+        </div>
+        <div>
+          <span>Runs</span>
+          <strong>{{stats.totalRuns}}</strong>
+        </div>
+        <div>
+          <span>Wickets</span>
+          <strong>{{stats.totalWickets}}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="empty-state cricket-card" *ngIf="!isLoading && players.length === 0">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <h2>No players found</h2>
+      <p>Add players first, then their profile records will appear here.</p>
+      <ion-button *ngIf="canManagePlayers" routerLink="/create-match1">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Add Players
+      </ion-button>
+    </section>
+
+    <section class="record-grid" *ngIf="selectedPlayer">
+      <article class="record-card cricket-card">
+        <span>Win / Loss</span>
+        <strong>{{stats.wins}} / {{stats.losses}}</strong>
+        <p>{{stats.ties}} ties, {{stats.abandoned}} abandoned, {{stats.live}} live</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Most Runs</span>
+        <strong>{{stats.mostRuns}}</strong>
+        <p>Best score in one match</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Most Wickets</span>
+        <strong>{{stats.mostWickets}}</strong>
+        <p>Best bowling in one match</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Catches</span>
+        <strong>{{stats.totalCatches}}</strong>
+        <p>Most in match: {{stats.mostCatches}}</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Fours</span>
+        <strong>{{stats.totalFours}}</strong>
+        <p>Most in match: {{stats.mostFours}}</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Sixes</span>
+        <strong>{{stats.totalSixes}}</strong>
+        <p>Most in match: {{stats.mostSixes}}</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Batting Avg</span>
+        <strong>{{stats.battingAverage}}</strong>
+        <p>Runs per match</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Strike Rate</span>
+        <strong>{{stats.strikeRate}}</strong>
+        <p>{{stats.totalBallsFaced}} balls faced</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Wickets Avg</span>
+        <strong>{{stats.wicketsPerMatch}}</strong>
+        <p>Wickets per match</p>
+      </article>
+      <article class="record-card cricket-card">
+        <span>Balls Bowled</span>
+        <strong>{{stats.totalBallsBowled}}</strong>
+        <p>Legal deliveries only</p>
+      </article>
+    </section>
+
+    <section class="matches-panel cricket-card" *ngIf="selectedPlayer">
+      <div class="section-title">
+        <h2>Match Calendar</h2>
+        <span>{{records.length}} matches</span>
+      </div>
+
+      <div class="calendar-panel" *ngIf="records.length > 0">
+        <div class="calendar-toolbar">
+          <ion-button fill="clear" size="small" (click)="previousMonth()">
+            <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <strong>{{calendarTitle}}</strong>
+          <ion-button fill="clear" size="small" (click)="nextMonth()">
+            <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <table class="calendar-table">
+          <thead>
+            <tr>
+              <th>Sun</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let week of calendarWeeks">
+              <td *ngFor="let day of week">
+                <button
+                  type="button"
+                  [class.muted]="!day.inMonth"
+                  [class.today]="day.isToday"
+                  [class.selected]="day.isSelected"
+                  [class.has-matches]="day.matchCount > 0"
+                  (click)="selectCalendarDay(day)">
+                  <span>{{day.dayNumber}}</span>
+                  <strong *ngIf="day.matchCount > 0">{{day.matchCount}}</strong>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title selected-day-title" *ngIf="records.length > 0">
+        <h2>{{selectedDateLabel}}</h2>
+        <span>{{selectedDateRecords.length}} matches</span>
+      </div>
+
+      <div class="match-list" *ngIf="selectedDateRecords.length > 0">
+        <article class="match-record" *ngFor="let record of selectedDateRecords">
+          <div class="match-main">
+            <span class="result-chip" [ngClass]="getResultClass(record.result)">{{record.result}}</span>
+            <div>
+              <h3>{{record.teamName}} vs {{record.opponent}}</h3>
+              <p>{{record.dateLabel}} - {{record.id}}</p>
+            </div>
+          </div>
+          <div class="match-numbers">
+            <div>
+              <span>Runs</span>
+              <strong>{{record.runs}}</strong>
+            </div>
+            <div>
+              <span>Wkts</span>
+              <strong>{{record.wickets}}</strong>
+            </div>
+            <div>
+              <span>4s</span>
+              <strong>{{record.fours}}</strong>
+            </div>
+            <div>
+              <span>6s</span>
+              <strong>{{record.sixes}}</strong>
+            </div>
+            <div>
+              <span>Ct</span>
+              <strong>{{record.catches}}</strong>
+            </div>
+            <div>
+              <span>BF</span>
+              <strong>{{record.ballsFaced}}</strong>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="no-records" *ngIf="records.length > 0 && selectedDateRecords.length === 0">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>No matches for this player on {{selectedDateLabel}}.</p>
+      </div>
+
+      <div class="no-records" *ngIf="records.length === 0">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        <p>No completed or live match records found for this player yet.</p>
+      </div>
+    </section>
+  </main>
+</ion-content>

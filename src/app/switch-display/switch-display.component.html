@@ -1,6 +1,6 @@
-<ion-content [fullscreen]="true">
-  <div style="text-align: center;font-family: 'Times New Roman', Times, serif;font-size: 20px;">
-    <h1>!!Selection!!</h1>
+<ion-content [fullscreen]="true" class="cricket-page innings-selection">
+  <div class="selection-heading">
+    <h1>Selection</h1>
     <p *ngIf="message !== ''">{{message}}</p>
   </div>
     <ion-grid>
@@ -9,7 +9,7 @@
         <ion-list>
           <ion-radio-group  (ionChange)="onPlayerDidSelectForBatting($event)">
             <ion-list-header>
-              <ion-label>Select Opening Batsman</ion-label>
+              <ion-label>Select Striker</ion-label>
             </ion-list-header>
 
             <ion-item *ngFor="let player of teams.battingTeam">
@@ -20,6 +20,22 @@
         </ion-list>
        </ion-col>
      </ion-row>
+     <ion-row *ngIf="teams.battingTeam">
+      <ion-col size="10" offset="1">
+       <ion-list>
+         <ion-radio-group  (ionChange)="onPlayerDidSelectForNonStriker($event)">
+           <ion-list-header>
+             <ion-label>Select Non-Striker</ion-label>
+           </ion-list-header>
+
+           <ion-item *ngFor="let player of teams.battingTeam">
+             <ion-label>{{player.name}}</ion-label>
+             <ion-radio slot="start" value="{{player.name}}" [disabled]="player.name === firstBatsman"></ion-radio>
+           </ion-item>
+         </ion-radio-group>
+       </ion-list>
+      </ion-col>
+    </ion-row>
      <ion-row *ngIf="teams.bowlingTeam">
       <ion-col size="10" offset="1">
        <ion-list>
@@ -38,6 +54,7 @@
     </ion-row>
     </ion-grid>
   </ion-content>
-  <ion-footer >
-     <ion-button [disabled]="!firstBatsman || !firstBowler" expand="full" shape="round" color="secondary" (click)="onStart()">Start Second Innings</ion-button>
+  <ion-footer class="selection-footer">
+     <ion-button class="cancel-action" expand="block" fill="outline" (click)="cancel()">Cancel</ion-button>
+     <ion-button [disabled]="isSaving || !firstBatsman || !firstNonStriker || firstBatsman === firstNonStriker || !firstBowler" expand="full" (click)="onStart()">Start Second Innings</ion-button>
   </ion-footer>

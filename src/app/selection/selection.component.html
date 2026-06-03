@@ -1,16 +1,16 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="cricket-toolbar">
     <ion-title>{{match.id}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button color="tertiary" size="small" (click)="close()">
-        close
+      <ion-button class="dialog-close-button" fill="clear" size="small" (click)="close()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-card>
+<ion-content class="cricket-page match-detail-page">
+  <ion-card class="cricket-card">
     <ion-card-header>
       <ion-card-title>
         <ion-chip outline color="tertiary">
@@ -33,7 +33,8 @@
     </ion-list-header>
     <ion-item *ngFor="let player of winTeam.players">
       <ion-avatar slot="start">
-        <img src="{{player.imgUrl}}">
+        <img *ngIf="player.imgUrl" [src]="player.imgUrl" (error)="player.imgUrl = ''">
+        <ion-icon *ngIf="!player.imgUrl" name="person-circle-outline"></ion-icon>
       </ion-avatar>
       <ion-label>
         <h2>{{player.name}}</h2>
@@ -58,7 +59,8 @@
       </ion-list-header>
       <ion-item *ngFor="let player of lostTeam.players">
         <ion-avatar slot="start">
-          <img src="{{player.imgUrl}}">
+          <img *ngIf="player.imgUrl" [src]="player.imgUrl" (error)="player.imgUrl = ''">
+          <ion-icon *ngIf="!player.imgUrl" name="person-circle-outline"></ion-icon>
         </ion-avatar>
         <ion-label>
           <h2>{{player.name}}</h2>

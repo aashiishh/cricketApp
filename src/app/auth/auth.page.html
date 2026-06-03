@@ -1,0 +1,66 @@
+<ion-content [fullscreen]="true" class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-card">
+      <div class="app-mark">
+        <div class="app-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <div>
+          <span>Live ScoreHub Scoring</span>
+          <strong>ScoreHub</strong>
+        </div>
+      </div>
+
+      <div class="auth-copy">
+        <h1>{{isLogin ? 'Welcome Back' : 'Create Account'}}</h1>
+        <p>{{isLogin ? 'Sign in to manage matches, player profiles, and scorecards.' : 'Register as a player. Admin access can be granted by a super admin later.'}}</p>
+      </div>
+
+      <div *ngIf="isLogin" class="auth-tabs" role="tablist" aria-label="Sign in method">
+        <button type="button" class="auth-tab selected" aria-selected="true">
+          Email
+        </button>
+        <button type="button" class="auth-tab disabled" aria-disabled="true" (click)="showOtpDisabledToast()">
+          OTP
+        </button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="auth-form">
+        <ion-item *ngIf="!isLogin" lines="none" class="auth-input">
+          <ion-label position="stacked">Name</ion-label>
+          <ion-input name="displayName" [(ngModel)]="displayName" required autocomplete="name" placeholder="Enter your name"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="auth-input">
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input type="email" name="email" [(ngModel)]="email" required autocomplete="email" placeholder="you@example.com"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="auth-input">
+          <ion-label position="stacked">Password</ion-label>
+          <ion-input type="password" name="password" [(ngModel)]="password" required minlength="6" autocomplete="current-password" placeholder="Minimum 6 characters"></ion-input>
+        </ion-item>
+
+        <ion-button type="submit" expand="block" class="auth-primary" [disabled]="authForm.invalid">
+          <ion-icon slot="start" [name]="isLogin ? 'log-in-outline' : 'person-add-outline'"></ion-icon>
+          {{isLogin ? 'Sign In' : 'Create Account'}}
+        </ion-button>
+
+        <ion-button type="button" fill="clear" expand="block" class="auth-secondary" (click)="toggleMode()">
+          {{isLogin ? 'Create new account' : 'I already have an account'}}
+        </ion-button>
+      </form>
+
+      <div class="auth-divider">
+        <span>or</span>
+      </div>
+
+      <ion-button type="button" expand="block" class="google-action" (click)="signInWithGoogle()">
+        <ion-icon slot="start" name="logo-google"></ion-icon>
+        Continue with Google
+      </ion-button>
+
+      <p class="auth-note">Secure sign-in for match scorers, admins, and players.</p>
+    </section>
+  </main>
+</ion-content>

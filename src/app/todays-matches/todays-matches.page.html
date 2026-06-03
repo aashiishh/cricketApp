@@ -1,18 +1,21 @@
 <ion-header>
-  <ion-toolbar color="danger">
+  <ion-toolbar class="cricket-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
+      <ion-button routerLink="/home" fill="clear">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title>Today's Matches</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="cricket-page matches-page">
   <ion-list>
     <ion-list-header>
       Total Matches - {{loadedMatches.length}}
     </ion-list-header>
-    <ion-card *ngFor="let match of loadedMatches.slice().reverse() let i = index;">
+    <ion-card class="cricket-card match-card" *ngFor="let match of loadedMatches.slice().reverse() let i = index;">
       <div>
       <p *ngIf="match.matchStatus.status === 'live'">
         <ion-chip color="warning">
@@ -29,10 +32,19 @@
           <ion-label>{{match.id}}</ion-label>
         </ion-chip>
       </p>
+      <p *ngIf="match.matchStatus.status === 'abandoned'">
+        <ion-chip color="warning">
+          <ion-icon name="baseball-outline"></ion-icon>
+          <ion-label>{{match.id}}</ion-label>
+        </ion-chip>
+        <ion-chip class="abandoned">
+          <ion-label>Abandoned</ion-label>
+        </ion-chip>
+      </p>
     </div>
       <div *ngIf="match.matchStatus.status === 'live'">
         <div style="text-align: center;">
-          <img height="40%" width="40%"
+          <img
             src="https://static.vecteezy.com/system/resources/thumbnails/001/814/915/small/cricket-logo-with-cross-bat-ball-and-field-modern-professional-sport-retro-style-emblem-and-template-logotype-design-vector.jpg" />
         </div>
         <ion-card-header>
@@ -74,13 +86,20 @@
               {{match.scoreboard.teamB.wickets}} wickets</h3>
           </div>
         </ion-card-content>
-        <div class="smtxt">
-          <ion-button size="small" fill="outline" slot="end" routerLink="/scoreboard">View</ion-button>
+        <div class="match-actions">
+          <ion-button size="small" fill="solid" slot="end" [routerLink]="['/scoreboard', match.id]">
+            <ion-icon slot="start" name="eye-outline"></ion-icon>
+            View
+          </ion-button>
+          <ion-button *ngIf="canManageMatches" size="small" fill="outline" color="danger" (click)="confirmDeleteMatch(match)">
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            Delete
+          </ion-button>
       </div>
       </div>
       <div *ngIf="match.matchStatus.status === 'end'">
         <div style="text-align: center;">
-          <img height="40%" width="40%"
+          <img
             src="https://static.vecteezy.com/system/resources/thumbnails/001/814/915/small/cricket-logo-with-cross-bat-ball-and-field-modern-professional-sport-retro-style-emblem-and-template-logotype-design-vector.jpg" />
         </div>
         <ion-card-header>
@@ -114,8 +133,41 @@
             </div>
           </div>
         </ion-card-content>
-        <div class="smtxt">
-            <ion-button size="small" fill="outline" slot="end" (click)="viewMatchDetails(match)">View</ion-button>
+        <div class="match-actions">
+            <ion-button size="small" fill="solid" slot="end" (click)="viewMatchDetails(match)">
+              <ion-icon slot="start" name="eye-outline"></ion-icon>
+              View
+            </ion-button>
+            <ion-button *ngIf="canManageMatches" size="small" fill="outline" color="danger" (click)="confirmDeleteMatch(match)">
+              <ion-icon slot="start" name="trash-outline"></ion-icon>
+              Delete
+            </ion-button>
+        </div>
+      </div>
+      <div *ngIf="match.matchStatus.status === 'abandoned'">
+        <ion-card-header>
+          <ion-card-subtitle>
+            <ion-chip outline color="tertiary">
+              <ion-label>{{match.teams.teamA.name}} v/s {{match.teams.teamB.name}}</ion-label>
+            </ion-chip>
+          </ion-card-subtitle>
+          <ion-card-title>
+            Match abandoned by admin
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <h3>{{match.teams.teamA.name}} {{match.scoreboard.teamA.runs}}/{{match.scoreboard.teamA.wickets}} from {{match.scoreboard.teamA.overs}}.{{match.scoreboard.teamA.balls}} overs</h3>
+          <h3>{{match.teams.teamB.name}} {{match.scoreboard.teamB.runs}}/{{match.scoreboard.teamB.wickets}} from {{match.scoreboard.teamB.overs}}.{{match.scoreboard.teamB.balls}} overs</h3>
+        </ion-card-content>
+        <div class="match-actions">
+            <ion-button size="small" fill="solid" (click)="viewMatchDetails(match)">
+              <ion-icon slot="start" name="eye-outline"></ion-icon>
+              View
+            </ion-button>
+            <ion-button *ngIf="canManageMatches" size="small" fill="outline" color="danger" (click)="confirmDeleteMatch(match)">
+              <ion-icon slot="start" name="trash-outline"></ion-icon>
+              Delete
+            </ion-button>
         </div>
       </div>
     </ion-card>

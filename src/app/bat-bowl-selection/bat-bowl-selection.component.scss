@@ -1,49 +1,106 @@
-#container {
-    text-align: center;
-  
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 40%;
-    transform: translateY(-50%);
-  }
-  
-  #container strong {
-    font-size: 30px;
-    line-height: 26px;
-    color: rgb(88, 46, 240);
-  }
-  
-  #container p {
-    font-size: 16px;
-    line-height: 22px;
-  
-    color: #8c8c8c;
-  
-    margin: 0;
-  }
-  
-  #container a {
-    text-decoration: none;
-  }
-   .black
-  {
-    --background: rgb(49, 91, 230);
+.toss-page {
+  ion-grid {
+    padding: 14px;
   }
 
-  
-  h2{
-    font-size: 25px;
-    color: rgb(7, 7, 7);
-    background-color: rgb(158, 201, 245);
+  ion-list {
+    background: transparent;
+    border: 1px solid var(--cricket-line);
+    border-radius: 8px;
+    overflow: hidden;
   }
-  
-  .textsize
-  {
-    font-size: small;
+
+  ion-list-header,
+  ion-item {
+    --background: var(--cricket-surface);
+    --color: var(--cricket-text);
   }
-  ion-footer {
-    &.footer-md::before {
-        background-image: none;
+
+  ion-list-header {
+    color: var(--cricket-accent);
+    font-weight: 800;
+  }
+
+  ion-radio {
+    --color-checked: var(--cricket-action);
+  }
+}
+
+.toss-heading {
+  padding: 28px 20px 0;
+  text-align: center;
+
+  h1 {
+    color: var(--cricket-accent);
+    font-size: 2.6rem;
+    font-weight: 900;
+    margin: 0;
+  }
+}
+
+.selection-shell {
+  margin: 0 auto;
+  max-width: 620px;
+  padding: 18px 0 92px;
+  text-align: center;
+}
+
+h2 {
+  color: var(--cricket-text);
+  font-size: 1.45rem;
+  font-weight: 900;
+  margin: 0 0 16px;
+}
+
+ion-button {
+  --background: var(--cricket-accent);
+  --background-activated: #1e40af;
+  --border-radius: 8px;
+  --box-shadow: none;
+  --color: #ffffff;
+  font-weight: 800;
+  margin-bottom: 12px;
+  text-transform: none;
+}
+
+.selection-footer {
+  background: var(--cricket-bg);
+  border-top: 1px solid var(--cricket-line);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
+  padding: 10px 14px;
+  position: relative;
+  z-index: 5;
+
+  &.footer-md::before {
+    background-image: none;
+  }
+}
+
+.cancel-action {
+  --background: #ffffff;
+  --border-color: var(--cricket-danger);
+  --color: var(--cricket-danger);
+}
+
+.dialog-close-button {
+  --color: var(--cricket-text);
+  --color-hover: var(--cricket-accent);
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .selection-footer {
+    grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
+    padding: 8px 10px;
+
+    ion-button {
+      min-height: 46px;
+      white-space: normal;
     }
+  }
 }

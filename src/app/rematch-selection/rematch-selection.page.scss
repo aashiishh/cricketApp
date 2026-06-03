@@ -1,0 +1,12 @@
+.rematch-page {
+  ion-list {
+    background: transparent;
+  }
+
+  ion-item,
+  ion-list-header {
+    --background: var(--cricket-surface);
+    --border-color: var(--cricket-line);
+    --color: var(--cricket-text);
+  }
+}

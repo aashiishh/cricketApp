@@ -5,10 +5,10 @@ import { LoadingController, ModalController, ToastController } from '@ionic/angu
 import { Subscription } from 'rxjs';
 import { AddPlayerComponent } from '../add-player/add-player.component';
 import { ApiServiceService } from '../api-service.service';
+import { AuthService } from '../auth/auth.service';
 import { BatBowlSelectionComponent } from '../bat-bowl-selection/bat-bowl-selection.component';
 import { Match } from '../models/match';
 import { Overs } from '../models/overs';
-import { Over } from '../models/over';
 import { Ball } from '../models/ball'
 import { Player } from '../models/players';
 import { Team } from '../models/team';
@@ -59,18 +59,73 @@ teams : Teams = {
   private playersSub : Subscription;
   @ViewChild('f', {static: true}) form1: NgForm;
 
-  constructor(private apiService:ApiServiceService,private modalCtrl: ModalController,private loadingCtrl:LoadingController,private toastCtrl:ToastController,private router:Router) { }
+  constructor(private apiService:ApiServiceService,private modalCtrl: ModalController,private loadingCtrl:LoadingController,private toastCtrl:ToastController,private router:Router,private authService:AuthService) { }
+
+  get canManagePlayers() {
+    return this.authService.canManagePlayers;
+  }
+
+  private createMatchPlayer(player: Player): Player {
+    return {
+      ...player,
+      isSelected: false,
+      onPitch: false,
+      isWicket: false,
+      ballsPlayed: 0,
+      wicketsTaken: 0,
+      runs: 0,
+      runsGiven: 0,
+      isStriker: false
+    };
+  }
+
+  private showToast(message: string, color: string = 'danger') {
+    this.toastCtrl.create({
+      message,
+      color,
+      position: 'bottom',
+      duration: 2500
+    }).then(toast => {
+      toast.present();
+    });
+  }
+
+  private openStartMatchModal(loader?: HTMLIonLoadingElement) {
+    loader?.dismiss();
+    this.modalCtrl.create({
+      component: BatBowlSelectionComponent,
+      componentProps: {match : this.match},
+      backdropDismiss: false
+    }).then(modal => {
+      modal.present();
+      return modal.onDidDismiss();
+    }).then(result => {
+      if (result.role === 'confirm') {
+        this.toastCtrl.create({
+          message: 'Match created.',
+          color: 'success',
+          position: 'bottom',
+          duration: 2000
+        }).then(toast => {
+          toast.present();
+          toast.onDidDismiss().then(()=> {
+            this.router.navigate(['/scoreboard', this.match.id]);
+          });
+        });
+      }
+    });
+  }
 
   ngOnInit() {
     this.playersSub = this.apiService.players.subscribe(players => {
       this.loadedPlayers = players;
-      this.playerstoDisplay = this.loadedPlayers;
+      this.updateDisplayedPlayers();
     });
     this.matchSub = this.apiService.todaysMatches.subscribe(matches => {
       this.loadedMatches = matches;
       console.log('All Matches - ',this.loadedMatches.length)
  })
-    this.playerstoDisplay = this.loadedPlayers;
+    this.updateDisplayedPlayers();
   }
 
   ionViewWillEnter()
@@ -78,16 +133,28 @@ teams : Teams = {
       this.isLoading = true;
       this.apiService.fetchPlayersList().subscribe(() => {
         this.isLoading = false;
+      }, () => {
+        this.isLoading = false;
+        this.showToast('Unable to load players.');
       });
       this.apiService.fetchTodaysMatchesList().subscribe(matches => {
         console.log(matches)
         this.isLoading = false;
+      }, () => {
+        this.isLoading = false;
+        this.showToast('Unable to load today\'s matches.');
       });
   }
 
   onAddPlayer() {
+    if (!this.canManagePlayers) {
+      this.showToast('Only Admin can add players.', 'warning');
+      return;
+    }
+
     this.modalCtrl.create({
-      component: AddPlayerComponent
+      component: AddPlayerComponent,
+      backdropDismiss: false
     }).then(modal => {
       modal.present();
       return modal.onDidDismiss();
@@ -99,7 +166,7 @@ teams : Teams = {
             message: 'Adding Player...'
           }).then(loader => {
             loader.present();
-            this.player = new Player(Math.random().toString(),resultData.data.newPlayerData.name,resultData.data.newPlayerData.desc);
+            this.player = new Player(Math.random().toString(),resultData.data.newPlayerData.name,resultData.data.newPlayerData.desc,resultData.data.newPlayerData.imgUrl);
             this.apiService.addNewPlayerToPlayersList(this.player).subscribe(() => {
               console.log(this.player,' added successfully')
               loader.dismiss();
@@ -112,7 +179,10 @@ teams : Teams = {
                 }).then(toast => {
                   toast.present();
                 })
-            })
+              })
+            }, () => {
+              loader.dismiss();
+              this.showToast('Unable to add player.');
             })
           });
         }
@@ -120,21 +190,65 @@ teams : Teams = {
     )
   }
 
+  editPlayer(player: Player) {
+    if (!this.canManagePlayers) {
+      this.showToast('Only Admin can edit players.', 'warning');
+      return;
+    }
+
+    this.modalCtrl.create({
+      component: AddPlayerComponent,
+      componentProps: { playerToEdit: player },
+      backdropDismiss: false
+    }).then(modal => {
+      modal.present();
+      return modal.onDidDismiss();
+    }).then(resultData => {
+      if (resultData.role === 'confirm') {
+        const updatedPlayer: Player = {
+          ...player,
+          name: resultData.data.newPlayerData.name,
+          description: resultData.data.newPlayerData.desc,
+          imgUrl: resultData.data.newPlayerData.imgUrl
+        };
+        this.apiService.updatePlayer(updatedPlayer).subscribe(() => {
+          this.loadedPlayers = this.loadedPlayers.map(existingPlayer => existingPlayer.id === updatedPlayer.id ? updatedPlayer : existingPlayer);
+          this.playersForTeam1 = this.playersForTeam1.map(existingPlayer => existingPlayer.id === updatedPlayer.id ? this.createMatchPlayer(updatedPlayer) : existingPlayer);
+          this.playersForTeam2 = this.playersForTeam2.map(existingPlayer => existingPlayer.id === updatedPlayer.id ? this.createMatchPlayer(updatedPlayer) : existingPlayer);
+          this.updateDisplayedPlayers();
+          this.showToast(updatedPlayer.name + ' updated.', 'success');
+        }, () => {
+          this.showToast('Unable to update player.');
+        });
+      }
+    });
+  }
+
   onTeamsNameSubmitted()
   {
-    this.loadingCtrl.create({
-      message: 'getting Players list...'
-    }).then(loader => {
-      loader.present();
-    setTimeout(()=> {
-      loader.dismiss();
-    },4000)
-  });
     if(!this.form1.valid)
     return;
-    this.teamA.name = this.form1.value['name1'];
-    this.teamB.name = this.form1.value['name2'];
-    const oversCount = this.form1.value['oversCount'];
+    const teamAName = String(this.form1.value['name1']).trim();
+    const teamBName = String(this.form1.value['name2']).trim();
+    const oversCount = Number(this.form1.value['oversCount']);
+
+    if (!teamAName || !teamBName) {
+      this.showToast('Please enter both team names.');
+      return;
+    }
+    if (teamAName.toLowerCase() === teamBName.toLowerCase()) {
+      this.showToast('Team names must be different.');
+      return;
+    }
+    if (!Number.isInteger(oversCount) || oversCount < 1 || oversCount > 50) {
+      this.showToast('Overs must be a whole number between 1 and 50.');
+      return;
+    }
+
+    this.teamA.name = teamAName;
+    this.teamB.name = teamBName;
+    this.match.teamOvers.teamAOvers = new Overs([],0,0);
+    this.match.teamOvers.teamBOvers = new Overs([],0,0);
     for(let i=0;i<oversCount;i++)
     {
       let ballsA  = [];
@@ -163,65 +277,131 @@ teams : Teams = {
       this.match.teamOvers.teamBOvers.overs.push(overB);
     }
     this.match.teamOvers.oversCount = oversCount;
+    this.selectedTeam = "teamA";
+    this.updateDisplayedPlayers();
   }
+
+  onTeamDidChange() {
+    this.updateDisplayedPlayers();
+  }
+
+  getSelectedTeamName() {
+    if (this.selectedTeam === "teamA") {
+      return this.teamA.name;
+    }
+    if (this.selectedTeam === "teamB") {
+      return this.teamB.name;
+    }
+    return '';
+  }
+
+  getSelectedTeamCount() {
+    if (this.selectedTeam === "teamA") {
+      return this.playersForTeam1.length;
+    }
+    if (this.selectedTeam === "teamB") {
+      return this.playersForTeam2.length;
+    }
+    return 0;
+  }
+
+  isTeamReady(team: string) {
+    return team === "teamA" ? this.playersForTeam1.length >= 2 : this.playersForTeam2.length >= 2;
+  }
+
+  private isPlayerInTeam(player: Player, team: string) {
+    const players = team === "teamA" ? this.playersForTeam1 : this.playersForTeam2;
+    return players.some(selectedPlayer => selectedPlayer.id === player.id);
+  }
+
+  private updateDisplayedPlayers() {
+    if (!this.loadedPlayers) {
+      this.playerstoDisplay = [];
+      return;
+    }
+
+    this.playerstoDisplay = this.loadedPlayers.filter(player => {
+      if (this.selectedTeam === "teamA") {
+        return !this.isPlayerInTeam(player, "teamB");
+      }
+      if (this.selectedTeam === "teamB") {
+        return !this.isPlayerInTeam(player, "teamA");
+      }
+      return !this.isPlayerInTeam(player, "teamA") && !this.isPlayerInTeam(player, "teamB");
+    });
+
+    this.playerstoDisplay.forEach(player => {
+      player.isSelected = this.selectedTeam ? this.isPlayerInTeam(player, this.selectedTeam) : false;
+    });
+  }
+
   onPlayerDidSelected(selectedPlayer : Player)
   {
-      if(selectedPlayer.isSelected && this.selectedTeam === "teamA")
-      {
-        selectedPlayer.ballsPlayed = 0;
-        selectedPlayer.wicketsTaken = 0;
-        selectedPlayer.runs = 0;
-        selectedPlayer.runsGiven = 0;
-        this.playersForTeam1.push(selectedPlayer);
+    if (!this.selectedTeam) {
+      selectedPlayer.isSelected = false;
+      this.showToast('Please select a team first.');
+      return;
+    }
+
+    if (this.selectedTeam === "teamA") {
+      this.playersForTeam1 = this.playersForTeam1.filter(i => i.id !== selectedPlayer.id);
+      this.playersForTeam2 = this.playersForTeam2.filter(i => i.id !== selectedPlayer.id);
+      if (selectedPlayer.isSelected) {
+        this.playersForTeam1.push(this.createMatchPlayer(selectedPlayer));
       }
-      else
-      this.playersForTeam1 = this.playersForTeam1.filter(i => i.id !== selectedPlayer.id); //when user de-select the item
-      if(selectedPlayer.isSelected && this.selectedTeam === "teamB")
-      {
-        selectedPlayer.ballsPlayed = 0;
-        selectedPlayer.wicketsTaken = 0;
-        selectedPlayer.runs = 0;
-        selectedPlayer.runsGiven = 0;
-        this.playersForTeam2.push(selectedPlayer);
+    }
+
+    if (this.selectedTeam === "teamB") {
+      this.playersForTeam2 = this.playersForTeam2.filter(i => i.id !== selectedPlayer.id);
+      this.playersForTeam1 = this.playersForTeam1.filter(i => i.id !== selectedPlayer.id);
+      if (selectedPlayer.isSelected) {
+        this.playersForTeam2.push(this.createMatchPlayer(selectedPlayer));
       }
-      else
-        this.playersForTeam2 = this.playersForTeam2.filter(i => i.id !== selectedPlayer.id); //when user de-select the item
+    }
+
+    this.teamA.players = this.playersForTeam1;
+    this.teamB.players = this.playersForTeam2;
+    this.updateDisplayedPlayers();
+  }
+
+  saveSelectedTeam() {
+    if (!this.selectedTeam) {
+      this.showToast('Please select a team.');
+      return;
+    }
+    if (this.getSelectedTeamCount() < 2) {
+      this.showToast('Select at least 2 players for ' + this.getSelectedTeamName() + '.');
+      return;
+    }
+
+    const savedTeamName = this.getSelectedTeamName();
+    if (this.selectedTeam === "teamA" && !this.isTeamReady("teamB")) {
+      this.selectedTeam = "teamB";
+    } else if (this.selectedTeam === "teamB" && !this.isTeamReady("teamA")) {
+      this.selectedTeam = "teamA";
+    }
+    this.updateDisplayedPlayers();
+    this.showToast(savedTeamName + ' saved.', 'success');
   }
 
   onCreateTeam()
   {
-    //if(this.playersForTeam1.length==0 && this.playersForTeam2.length==0)
-    if(this.playersForTeam1.length>0 &&  this.playersForTeam2.length==0)
-    {
-      this.teamA.players = this.playersForTeam1;
-      this.playersForTeam1.forEach(player => {
-           this.playerstoDisplay = this.playerstoDisplay.filter(i=> i.id !== player.id)
-           this.selectedTeam = "";
-      })
+    if (this.playersForTeam1.length < 2 || this.playersForTeam2.length < 2) {
+      this.showToast('Each team needs at least 2 players.');
+      return;
     }
-    else if(this.playersForTeam2.length>0 &&  this.playersForTeam1.length==0)
-    {
-      this.teamB.players = this.playersForTeam2;
-      this.playersForTeam2.forEach(player => {
-           this.playerstoDisplay = this.playerstoDisplay.filter(i=> i.id !== player.id)
-           this.selectedTeam = "";
-      })
-    }
-    else
-    {
-      if(this.playersForTeam2.length>0 &&  this.playersForTeam1.length>0)
-      {
-        this.teamB.players = this.playersForTeam2;
-        this.teamA.players = this.playersForTeam1;
-        this.match.teams.teamA = this.teamA;
-        this.match.teams.teamB = this.teamB;
 
-        this.loadingCtrl.create({
-          message: 'Creating teams...'
-        }).then(loader => {
+    this.teamB.players = this.playersForTeam2;
+    this.teamA.players = this.playersForTeam1;
+    this.match.teams.teamA = this.teamA;
+    this.match.teams.teamB = this.teamB;
+
+    this.loadingCtrl.create({
+      message: 'Preparing match...'
+    }).then(loader => {
           loader.present();
           let matchNumber = (this.loadedMatches.length)+1;
-          this.match.id = 'Match'+matchNumber;
+          this.match.id = 'Match'+matchNumber+'_'+Date.now();
           this.match.matchStatus = {
             status : 'live',
             whoWon : '',
@@ -241,38 +421,8 @@ teams : Teams = {
             wickets: 0
           },
           } //before starting the match
-          this.apiService.onMatchCreated(this.match).subscribe(result => {
-            if(result){
-             console.log("Match Created");
-             loader.dismiss();
-            }
-             else
-             console.log('Error occured while creating match');
-          })
-             loader.onDidDismiss().then(() => {
-                this.toastCtrl.create({
-                  message: 'Both Team Created!!',
-                  color: 'success',
-                  position: 'bottom',
-                  duration: 2000
-                }).then(toast => {
-                  toast.present();
-                  toast.onDidDismiss().then(()=> {
-                    this.modalCtrl.create({
-                      component: BatBowlSelectionComponent,
-                      componentProps: {match : this.match}
-                    }).then(modal => {
-                      modal.present();
-                      return modal.onDidDismiss();
-                    }).then(() => {
-                      this.router.navigateByUrl('/scoreboard');
-                    });
-                  })
-                })
-            })
+          this.openStartMatchModal(loader);
        })
-      }
-    }
   }
 
   ngOnDestroy()

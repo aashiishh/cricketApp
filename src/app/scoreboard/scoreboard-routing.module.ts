@@ -5,6 +5,10 @@ import { ScoreboardPage } from './scoreboard.page';
 
 const routes: Routes = [
   {
+    path: ':matchId',
+    component: ScoreboardPage
+  },
+  {
     path: '',
     component: ScoreboardPage
   }

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { ApiServiceService } from '../api-service.service';
 import { Match } from '../models/match';
 import { Player } from '../models/players';
@@ -30,8 +30,16 @@ export class BatBowlSelectionComponent implements OnInit {
   dispTeamForBat : Player[];
   dispTeamForBowl : Player[];
   firstBatsman : string;
+  firstNonStriker : string;
   firstBowler : string;
-  constructor(private modalCtrl: ModalController,private service:ApiServiceService,private router:Router) { }
+  isSaving = false;
+  constructor(
+    private modalCtrl: ModalController,
+    private service:ApiServiceService,
+    private router:Router,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
+  ) { }
 
   ngOnInit() {}
 
@@ -64,28 +72,36 @@ export class BatBowlSelectionComponent implements OnInit {
   {
     console.log("Opening Batsman - ",value.detail.value)
     this.firstBatsman = value.detail.value;
-    if(this.match.teams.teamA.bat_bowl_first === 'bat')
-    {
-      this.match.teams.teamA.players.forEach(player => {
-           if(player.name === this.firstBatsman){
-              player.onPitch = true;
-              player.isWicket = false;
-          }
-          else
-            player.onPitch = false;
-      })
-    }
-    else
-    {
-        this.match.teams.teamB.players.forEach(player => {
-          if(player.name === this.firstBatsman){
-            player.onPitch = true;
-            player.isWicket = false;
-          }
-          else
-            player.onPitch = false;
-        })
-    }
+    this.setOpeningBatters();
+  }
+  onPlayerDidSelectForNonStriker(value)
+  {
+    console.log("Opening Non-Striker - ",value.detail.value)
+    this.firstNonStriker = value.detail.value;
+    this.setOpeningBatters();
+  }
+  setOpeningBatters()
+  {
+    const battingPlayers = this.match.teams.teamA.bat_bowl_first === 'bat'
+      ? this.match.teams.teamA.players
+      : this.match.teams.teamB.players;
+
+    battingPlayers.forEach(player => {
+      if(player.name === this.firstBatsman){
+        player.onPitch = true;
+        player.isWicket = false;
+        player.isStriker = true;
+      }
+      else if(player.name === this.firstNonStriker){
+        player.onPitch = true;
+        player.isWicket = false;
+        player.isStriker = false;
+      }
+      else {
+        player.onPitch = false;
+        player.isStriker = false;
+      }
+    })
   }
   onPlayerDidSelectForBowling(value)
   {
@@ -98,6 +114,7 @@ export class BatBowlSelectionComponent implements OnInit {
             player.onPitch = true;
           else
           player.onPitch = false;
+          player.isStriker = false;
       })
     }
     else
@@ -108,6 +125,7 @@ export class BatBowlSelectionComponent implements OnInit {
               player.onPitch = true;
               else
               player.onPitch = false;
+            player.isStriker = false;
         })
       }
     }
@@ -115,12 +133,47 @@ export class BatBowlSelectionComponent implements OnInit {
 
   startMatch()
   {
-    this.modalCtrl.dismiss();
+    if (!this.firstBatsman || !this.firstNonStriker || this.firstBatsman === this.firstNonStriker || !this.firstBowler) {
+      this.toastCtrl.create({
+        message: 'Select striker, non-striker, and opening bowler.',
+        color: 'warning',
+        position: 'bottom',
+        duration: 2500
+      }).then(toast => toast.present());
+      return;
+    }
+
+    this.isSaving = true;
+    this.loadingCtrl.create({
+      message: 'Starting match...'
+    }).then(loader => {
+      loader.present();
+      const saveRequest: any = this.match.createdAt
+        ? this.service.onUpdateBatBowlSelectionOrMatchScore(this.match)
+        : this.service.onMatchCreated(this.match);
+
+      saveRequest.subscribe({
+        next: () => {
+          this.isSaving = false;
+          loader.dismiss();
+          this.modalCtrl.dismiss({ started: true }, 'confirm');
+        },
+        error: error => {
+          this.isSaving = false;
+          loader.dismiss();
+          this.toastCtrl.create({
+            message: error?.message || 'Unable to start match.',
+            color: 'danger',
+            position: 'bottom',
+            duration: 3000
+          }).then(toast => toast.present());
+        }
+      });
+    });
   }
 
-  ionViewWillLeave()
+  cancel()
   {
-    this.service.onUpdateBatBowlSelectionOrMatchScore(this.match).subscribe(result => {
-    });
+    this.modalCtrl.dismiss(null, 'cancel');
   }
 }

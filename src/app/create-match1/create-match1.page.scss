@@ -1,0 +1,141 @@
+.create-page {
+  ion-grid {
+    margin: 0 auto;
+    max-width: 1100px;
+    padding: 16px 12px 96px;
+  }
+
+  ion-item {
+    --background: #ffffff;
+    --border-color: var(--cricket-line);
+    --border-radius: 8px;
+    --color: var(--cricket-text);
+    --highlight-color-focused: var(--cricket-accent);
+    margin-bottom: 12px;
+  }
+
+  ion-label {
+    color: var(--cricket-muted);
+  }
+
+  ion-list {
+    background: transparent;
+  }
+
+  ion-list-header {
+    color: var(--cricket-accent);
+    font-weight: 800;
+  }
+
+  ion-avatar img {
+    border: 1px solid var(--cricket-line);
+  }
+
+  ion-avatar {
+    align-items: center;
+    background: var(--cricket-surface-strong);
+    border: 1px solid var(--cricket-line);
+    display: flex;
+    justify-content: center;
+  }
+
+  ion-avatar ion-icon {
+    color: var(--cricket-accent);
+    font-size: 34px;
+  }
+
+  ion-checkbox {
+    --checkbox-background-checked: var(--cricket-action);
+    --border-color-checked: var(--cricket-action);
+  }
+}
+
+.setup-card {
+  padding: 20px;
+}
+
+.form-action-col {
+  padding-top: 8px;
+}
+
+.team-progress {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.team-progress button {
+  align-items: center;
+  background: var(--cricket-surface-strong);
+  border: 1px solid var(--cricket-line);
+  border-radius: 8px;
+  color: var(--cricket-text);
+  display: flex;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 10px 12px;
+}
+
+.team-progress button.active {
+  border-color: var(--cricket-accent);
+  box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.12);
+}
+
+.team-progress button.ready strong {
+  background: var(--cricket-accent);
+  color: #ffffff;
+}
+
+.team-progress span {
+  font-weight: 800;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-progress strong {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--cricket-line);
+  border-radius: 50%;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  min-width: 28px;
+}
+
+.team-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+
+  ion-button {
+    --border-radius: 8px;
+    text-transform: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .setup-card,
+  .form-action-col {
+    max-width: 760px;
+  }
+}
+
+.primary-action {
+  --background: var(--cricket-accent);
+  --background-activated: #1e40af;
+  --border-radius: 8px;
+  --box-shadow: none;
+  --color: #ffffff;
+  font-weight: 800;
+  text-transform: none;
+}
+
+ion-fab-button {
+  --background: var(--cricket-action);
+  --background-activated: #1fac93;
+  --box-shadow: none;
+  --color: #ffffff;
+}

@@ -1,0 +1,34 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "Users": {
+      ".read": "root.child('Users').child(auth.uid).child('role').val() === 'super-admin'",
+      "$uid": {
+        ".read": "auth.uid === $uid || root.child('Users').child(auth.uid).child('role').val() === 'super-admin'",
+        ".write": "root.child('Users').child(auth.uid).child('role').val() === 'super-admin' || (auth.uid === $uid && ((!data.exists() && newData.child('role').val() === 'player') || (data.exists() && newData.child('role').val() === data.child('role').val())))",
+        ".validate": "!newData.exists() || (newData.hasChildren(['uid', 'email', 'displayName', 'role', 'createdAt', 'updatedAt']) && newData.child('uid').val() === $uid && (newData.child('role').val() === 'super-admin' || newData.child('role').val() === 'admin' || newData.child('role').val() === 'player'))"
+      }
+    },
+    "Cricket": {
+      "Players": {
+        ".read": "auth != null",
+        "$playerId": {
+          ".write": "root.child('Users').child(auth.uid).child('role').val() === 'admin' || root.child('Users').child(auth.uid).child('role').val() === 'super-admin' || ((!data.exists() && newData.exists() && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('userId').val() === auth.uid && (!newData.exists() || newData.child('userId').val() === auth.uid)))",
+          ".validate": "!newData.exists() || (newData.hasChildren(['name']) && !newData.child('email').exists() && !newData.child('phone').exists())"
+        }
+      },
+      "Game": {
+        ".read": "auth != null",
+        "$date": {
+          "Matches": {
+            "$matchId": {
+              ".write": "root.child('Users').child(auth.uid).child('role').val() === 'admin' || root.child('Users').child(auth.uid).child('role').val() === 'super-admin' || (!data.exists() && newData.exists() && newData.child('createdBy').val() === auth.uid) || (data.exists() && data.child('createdBy').val() === auth.uid && newData.exists() && newData.child('createdBy').val() === auth.uid)",
+              ".validate": "!newData.exists() || (newData.hasChildren(['createdBy', 'teams', 'scoreboard', 'teamOvers', 'matchStatus']) && newData.child('matchStatus').hasChildren(['status', 'whoWon', 'wonBy']))"
+            }
+          }
+        }
+      }
+    }
+  }
+}

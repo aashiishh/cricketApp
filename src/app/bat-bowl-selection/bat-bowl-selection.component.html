@@ -1,15 +1,26 @@
-<ion-content [fullscreen]="true">
+<ion-header>
+  <ion-toolbar class="cricket-toolbar">
+    <ion-title>Start Match</ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="dialog-close-button" fill="clear" (click)="cancel()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="cricket-page toss-page">
   @if (!dispTeamForBowl && !dispTeamForBat) {
-    <div  style="text-align: center;"><h1>Toss Time!!</h1></div>
+    <div class="toss-heading"><h1>Toss Time</h1></div>
   }
-  <div id="container">
+  <div id="container" class="selection-shell">
     <ion-grid>
       @if (!dispTeamForBowl && !dispTeamForBat) {
         <ion-row>
           <ion-col size="10" offset="1">
-            <h2>Who is going to BAT first!</h2>
-            <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="onBatTeamSelected(match.teams.teamA.name,match.teams.teamB.name)">{{match.teams.teamA.name}}</ion-button>
-            <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="onBatTeamSelected(match.teams.teamB.name,match.teams.teamA.name)">{{match.teams.teamB.name}}</ion-button>
+            <h2>Bat First</h2>
+            <ion-button expand="block" fill="solid" size="medium" (click)="onBatTeamSelected(match.teams.teamA.name,match.teams.teamB.name)">{{match.teams.teamA.name}}</ion-button>
+            <ion-button expand="block" fill="solid" size="medium" (click)="onBatTeamSelected(match.teams.teamB.name,match.teams.teamA.name)">{{match.teams.teamB.name}}</ion-button>
           </ion-col>
         </ion-row>
       }
@@ -19,12 +30,29 @@
             <ion-list>
               <ion-radio-group  (ionChange)="onPlayerDidSelectForBatting($event)">
                 <ion-list-header>
-                  <ion-label>Select Opening Batsman</ion-label>
+                  <ion-label>Select Striker</ion-label>
                 </ion-list-header>
                 @for (player of dispTeamForBat; track player) {
                   <ion-item>
                     <ion-label>{{player.name}}</ion-label>
                     <ion-radio slot="start" value="{{player.name}}" ></ion-radio>
+                  </ion-item>
+                }
+              </ion-radio-group>
+            </ion-list>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="10" offset="1">
+            <ion-list>
+              <ion-radio-group  (ionChange)="onPlayerDidSelectForNonStriker($event)">
+                <ion-list-header>
+                  <ion-label>Select Non-Striker</ion-label>
+                </ion-list-header>
+                @for (player of dispTeamForBat; track player) {
+                  <ion-item>
+                    <ion-label>{{player.name}}</ion-label>
+                    <ion-radio slot="start" value="{{player.name}}" [disabled]="player.name === firstBatsman"></ion-radio>
                   </ion-item>
                 }
               </ion-radio-group>
@@ -55,10 +83,11 @@
 
   </div>
 </ion-content>
-<ion-footer >
+<ion-footer class="selection-footer">
   <!--  <ion-button [disabled]="!firstBatsman || !firstBowler" expand="full" shape="round" color="secondary" [routerLink]="['/scoreboard',{
       firstBatsman : firstBatsman,
       firstBowler : firstBowler
     }]">Start Match</ion-button>-->
-<ion-button [disabled]="!firstBatsman || !firstBowler" expand="full" shape="round" color="secondary" (click)="startMatch()">Start Match</ion-button>
+<ion-button class="cancel-action" expand="block" fill="outline" (click)="cancel()">Cancel</ion-button>
+<ion-button [disabled]="isSaving || !firstBatsman || !firstNonStriker || firstBatsman === firstNonStriker || !firstBowler" expand="block" (click)="startMatch()">Start Match</ion-button>
 </ion-footer>

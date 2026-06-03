@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { LoadingController, ModalController } from '@ionic/angular';
+import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { ApiServiceService } from '../api-service.service';
 import { Match } from '../models/match';
 import { Player } from '../models/players';
@@ -33,8 +33,10 @@ export class SwitchDisplayComponent implements OnInit {
     matchStatus: { status: '', whoWon: '', wonBy: '' }
   };
   firstBatsman: string;
+  firstNonStriker: string;
   firstBowler: string;
-  constructor(private modalCtrl: ModalController,private loadingCtrl:LoadingController,private service:ApiServiceService) {
+  isSaving = false;
+  constructor(private modalCtrl: ModalController,private loadingCtrl:LoadingController,private service:ApiServiceService, private toastCtrl: ToastController) {
 
   }
 
@@ -54,12 +56,32 @@ export class SwitchDisplayComponent implements OnInit {
     this.firstBatsman = value.detail.value;
 
   }
+  onPlayerDidSelectForNonStriker(value) {
+    console.log("Opening Non-Striker - ", value.detail.value)
+    this.firstNonStriker = value.detail.value;
+  }
   onPlayerDidSelectForBowling(value) {
     console.log("Opening Bowler - ", value.detail.value)
     this.firstBowler = value.detail.value;
   }
 
+  cancel() {
+    this.modalCtrl.dismiss(null, 'cancel');
+  }
+
   onStart() {
+    if (!this.firstBatsman || !this.firstNonStriker || this.firstBatsman === this.firstNonStriker || !this.firstBowler) {
+      this.toastCtrl.create({
+        message: 'Select striker, non-striker, and opening bowler.',
+        color: 'warning',
+        position: 'bottom',
+        duration: 2500
+      }).then(toast => toast.present());
+      return;
+    }
+
+    this.isSaving = true;
+    const previousMatchState = JSON.parse(JSON.stringify(this.match));
     if(this.match.teams.teamA.currentStatus === 'bat'){
       this.match.teams.teamA.currentStatus = 'bowl';
       this.match.teams.teamB.currentStatus = 'bat';
@@ -67,15 +89,24 @@ export class SwitchDisplayComponent implements OnInit {
         if(player.name === this.firstBatsman){
            player.onPitch = true;
            player.isWicket = false;
+           player.isStriker = true;
         }
-        else
+        else if(player.name === this.firstNonStriker){
+           player.onPitch = true;
+           player.isWicket = false;
+           player.isStriker = false;
+        }
+        else {
            player.onPitch = false;
+           player.isStriker = false;
+        }
       })
       this.match.teams.teamA.players.forEach(player => {
         if(player.name === this.firstBowler)
           player.onPitch = true;
            else
            player.onPitch = false;
+        player.isStriker = false;
       })
   }
   else
@@ -88,23 +119,46 @@ export class SwitchDisplayComponent implements OnInit {
         player.onPitch = true;
          else
            player.onPitch = false;
+      player.isStriker = false;
     })
     this.match.teams.teamA.players.forEach(player => {
       if(player.name === this.firstBatsman){
         player.onPitch = true;
         player.isWicket = false;
+        player.isStriker = true;
      }
-         else
+      else if(player.name === this.firstNonStriker){
+        player.onPitch = true;
+        player.isWicket = false;
+        player.isStriker = false;
+     }
+         else {
            player.onPitch = false;
+           player.isStriker = false;
+         }
     })
   }
     this.loadingCtrl.create({
       message: 'starting match...'
     }).then(loader => {
       loader.present();
-      this.service.onUpdateBatBowlSelectionOrMatchScore(this.match).subscribe(() => {
+      this.service.onUpdateBatBowlSelectionOrMatchScore(this.match).subscribe({
+        next: () => {
+          this.isSaving = false;
           loader.dismiss();
           this.modalCtrl.dismiss({});
+        },
+        error: error => {
+          this.isSaving = false;
+          Object.assign(this.match, previousMatchState);
+          loader.dismiss();
+          this.toastCtrl.create({
+            message: error?.message || 'Unable to start next innings.',
+            color: 'danger',
+            position: 'bottom',
+            duration: 3000
+          }).then(toast => toast.present());
+        }
       })
     })
   }

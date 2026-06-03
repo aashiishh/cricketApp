@@ -1,0 +1,127 @@
+<ion-header>
+  <ion-toolbar class="cricket-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>My Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cricket-page my-profile-page">
+  <main class="profile-shell" *ngIf="player">
+    <section class="profile-hero cricket-card">
+      <div class="player-identity">
+        <ion-avatar>
+          <img *ngIf="player.imgUrl" [src]="player.imgUrl" (error)="player.imgUrl = ''">
+          <ion-icon *ngIf="!player.imgUrl" name="person-circle-outline"></ion-icon>
+        </ion-avatar>
+        <div>
+          <span>Signed-in player</span>
+          <h1>{{player.name}}</h1>
+          <p>{{player.description || 'Cricket player'}}</p>
+        </div>
+      </div>
+
+      <ion-segment [(ngModel)]="selectedTab" mode="ios">
+        <ion-segment-button value="profile">
+          <ion-label>Profile</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="career">
+          <ion-label>Career</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </section>
+
+    <section class="cricket-card detail-panel" *ngIf="selectedTab === 'profile'">
+      <div class="section-title">
+        <h2>Account Details</h2>
+        <ion-button fill="outline" size="small" (click)="editProfile()">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Edit
+        </ion-button>
+      </div>
+      <div class="profile-details">
+        <div>
+          <span>User ID</span>
+          <strong>{{authService.currentUser?.uid}}</strong>
+        </div>
+        <div>
+          <span>Player ID</span>
+          <strong>{{player.id}}</strong>
+        </div>
+        <div>
+          <span>Name</span>
+          <strong>{{player.name}}</strong>
+        </div>
+        <div>
+          <span>Email</span>
+          <strong>{{authService.currentUser?.email || 'Not set'}}</strong>
+        </div>
+        <div>
+          <span>Phone</span>
+          <strong>{{authService.currentUser?.phone || 'Not set'}}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="career-panel" *ngIf="selectedTab === 'career'">
+      <div class="record-grid">
+        <article class="record-card cricket-card">
+          <span>Matches</span>
+          <strong>{{stats.matches}}</strong>
+          <p>{{stats.wins}} wins, {{stats.losses}} losses</p>
+        </article>
+        <article class="record-card cricket-card">
+          <span>Batting</span>
+          <strong>{{stats.runs}}</strong>
+          <p>Avg {{stats.battingAverage}}, SR {{stats.strikeRate}}</p>
+        </article>
+        <article class="record-card cricket-card">
+          <span>Bowling</span>
+          <strong>{{stats.wickets}}</strong>
+          <p>{{stats.ballsBowled}} balls, {{stats.wicketsPerMatch}} wkts/match</p>
+        </article>
+        <article class="record-card cricket-card">
+          <span>Fielding</span>
+          <strong>{{stats.catches}}</strong>
+          <p>Most catches: {{stats.mostCatches}}</p>
+        </article>
+        <article class="record-card cricket-card">
+          <span>Boundaries</span>
+          <strong>{{stats.fours}} / {{stats.sixes}}</strong>
+          <p>4s / 6s</p>
+        </article>
+        <article class="record-card cricket-card">
+          <span>Best Match</span>
+          <strong>{{stats.mostRuns}}</strong>
+          <p>{{stats.mostWickets}} best wickets</p>
+        </article>
+      </div>
+
+      <section class="matches-panel cricket-card">
+        <div class="section-title">
+          <h2>Match Records</h2>
+          <span>{{records.length}} matches</span>
+        </div>
+        <article class="match-record" *ngFor="let record of records">
+          <div>
+            <span class="result-chip">{{record.result}}</span>
+            <h3>vs {{record.opponent}}</h3>
+            <p>{{record.id}}</p>
+          </div>
+          <div class="match-numbers">
+            <div><span>Runs</span><strong>{{record.runs}}</strong></div>
+            <div><span>Wkts</span><strong>{{record.wickets}}</strong></div>
+            <div><span>Ct</span><strong>{{record.catches}}</strong></div>
+            <div><span>4s</span><strong>{{record.fours}}</strong></div>
+            <div><span>6s</span><strong>{{record.sixes}}</strong></div>
+          </div>
+        </article>
+        <div class="no-records" *ngIf="records.length === 0">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+          <p>No match records found for your profile yet.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+</ion-content>

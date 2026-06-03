@@ -1,41 +1,77 @@
-<ion-content [fullscreen]="true" class="black">
+<ion-header>
+  <ion-toolbar class="cricket-toolbar home-app-toolbar">
+    <ion-buttons slot="start">
+      <div class="home-brand">
+        <div class="brand-badge">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <span>ScoreHub</span>
+      </div>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <div class="home-user">
+        <ion-avatar>
+          <img *ngIf="displayPhoto" [src]="displayPhoto" alt="Player photo">
+          <ion-icon *ngIf="!displayPhoto" name="person-circle-outline"></ion-icon>
+        </ion-avatar>
+        <span>{{displayName}}</span>
+      </div>
+      <ion-button class="logout-icon" fill="clear" (click)="logout()" aria-label="Logout">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
- <div id="container">
-   <h2>family</h2>
-  <h1>Cricket</h1>
-   <ion-grid>
-     <!-- <ion-row *ngIf="!players">
-       <ion-col size="10" offset="1">
+<ion-content [fullscreen]="true" class="cricket-page home-page">
+  <main class="home-shell">
+    <section class="brand-panel cricket-card">
+      <div class="brand-meta">
+        <span>Live scoring</span>
+      </div>
+      <h1>ScoreHub</h1>
+      <div class="score-preview">
+        <div>
+          <span class="score-label">Today's Matches</span>
+          <strong>{{loadedMatches ? loadedMatches.length : 0}}</strong>
+        </div>
+        <div>
+          <span class="score-label">Live Now</span>
+          <strong>{{liveMatches.length}}</strong>
+        </div>
+      </div>
+    </section>
 
-         <br><br>
-        <ion-item>
-          <ion-label position="floating" class="textsize">enter names of players</ion-label>
-          <ion-input type="text" [(ngModel)]="enteredPlayers"></ion-input>
-        </ion-item>
-        <br>
-        <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="addPlayers()">Add All Players</ion-button>
-        <br>
-       </ion-col>
-     </ion-row> -->
-     <ion-row >
-      <ion-col size="10" offset="1">
+    <section class="action-panel">
+      <ion-button expand="block" class="primary-action" routerLink="/create-match1">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Create Match
+      </ion-button>
 
-       <ion-button shape="round" *ngIf="!loadedMatches || !currentMatch || (currentMatchStatus && currentMatchStatus === 'end')" expand="block" fill="solid" size="medium" color="danger" routerLink="/create-match1">Create Match</ion-button>
-      <ion-button shape="round" *ngIf="currentMatchStatus && currentMatchStatus ==='live'" expand="block" fill="solid" size="medium" color="danger" routerLink="/scoreboard">Live Match</ion-button>
-      <!--<ion-button shape="round" *ngIf="currentMatchStatus && currentMatchStatus ==='live'" expand="block" fill="solid" size="medium" color="danger" routerLink="['/scoreboard',{currentMatch : currentMatch}]">Live Match</ion-button>-->
-      </ion-col>
-    </ion-row>
-    <ion-row *ngIf="loadedMatches && loadedMatches.length>=1">
-      <ion-col size="10" offset="1">
-      <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" routerLink="/todays-matches">Today's Matches</ion-button>
-    </ion-col>
-  </ion-row>
-     <ion-row >
-        <ion-col size="10" offset="1">
-        <ion-button shape="round" expand="block" fill="solid" size="medium" color="danger" (click)="career()">Career</ion-button>
-      </ion-col>
-    </ion-row>
-   </ion-grid>
+      <ion-button *ngIf="liveMatches.length > 0" expand="block" class="secondary-action" [routerLink]="liveMatchRoute">
+        <ion-icon slot="start" name="play-circle-outline"></ion-icon>
+        {{liveMatchesButtonText}}
+      </ion-button>
 
-  </div>
+      <ion-button *ngIf="loadedMatches && loadedMatches.length>=1" expand="block" class="secondary-action" routerLink="/todays-matches">
+        <ion-icon slot="start" name="calendar-outline"></ion-icon>
+        Today's Matches
+      </ion-button>
+
+      <ion-button expand="block" class="secondary-action" routerLink="/my-profile">
+        <ion-icon slot="start" name="trophy-outline"></ion-icon>
+        My Profile
+      </ion-button>
+
+      <ion-button expand="block" class="secondary-action" routerLink="/players">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        Find Players
+      </ion-button>
+
+      <ion-button *ngIf="canManageRoles" expand="block" class="secondary-action" routerLink="/admin/users">
+        <ion-icon slot="start" name="people-circle-outline"></ion-icon>
+        User Access
+      </ion-button>
+    </section>
+  </main>
 </ion-content>

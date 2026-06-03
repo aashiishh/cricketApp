@@ -1,0 +1,70 @@
+.innings-selection {
+  ion-grid {
+    padding: 12px 12px 90px;
+  }
+
+  ion-list {
+    background: transparent;
+    border: 1px solid var(--cricket-line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  ion-list-header,
+  ion-item {
+    --background: var(--cricket-surface);
+    --color: var(--cricket-text);
+  }
+
+  ion-list-header {
+    color: var(--cricket-accent);
+    font-weight: 800;
+  }
+
+  ion-radio {
+    --color-checked: var(--cricket-action);
+  }
+}
+
+.selection-heading {
+  padding: 24px 20px 8px;
+  text-align: center;
+
+  h1 {
+    color: var(--cricket-accent);
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  p {
+    color: var(--cricket-muted);
+    margin: 8px 0 0;
+  }
+}
+
+.selection-footer {
+  background: var(--cricket-bg);
+  border-top: 1px solid var(--cricket-line);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.56fr);
+  padding: 8px 12px;
+
+  ion-button {
+    --background: var(--cricket-action);
+    --background-activated: #1fac93;
+    --border-radius: 8px;
+    --box-shadow: none;
+    --color: #ffffff;
+    font-weight: 800;
+    text-transform: none;
+  }
+}
+
+.cancel-action {
+  --background: #ffffff;
+  --background-activated: rgba(220, 38, 38, 0.08);
+  --border-color: var(--cricket-danger);
+  --color: var(--cricket-danger);
+}

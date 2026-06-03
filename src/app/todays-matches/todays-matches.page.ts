@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { LoadingController, ModalController } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ApiServiceService } from '../api-service.service';
+import { AuthService } from '../auth/auth.service';
 import { Match } from '../models/match';
 import { SelectionComponent } from '../selection/selection.component';
 
@@ -29,9 +30,20 @@ export class TodaysMatchesPage implements OnInit,OnDestroy {
   currentMatchStatus : string = undefined;
   private matchSub : Subscription;
    //https://gali-cricket-27fdd-default-rtdb.asia-southeast1.firebasedatabase.app/Cricket/Game/29052021
-  constructor(private loadingCtrl:LoadingController,private apiService:ApiServiceService,private modalCtrl:ModalController) {
+  constructor(
+    private loadingCtrl:LoadingController,
+    private apiService:ApiServiceService,
+    private modalCtrl:ModalController,
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
+    private authService: AuthService
+  ) {
 
   }
+
+ get canManageMatches() {
+  return this.authService.canManageMatches;
+ }
 
  ngOnInit() {
   this.matchSub = this.apiService.todaysMatches.subscribe(matches => {
@@ -51,8 +63,8 @@ export class TodaysMatchesPage implements OnInit,OnDestroy {
             }
             mData.matchId = match.id;
             match.teams.teamA.players.forEach(player => {
-                const runs = player.runs;
-                const wickets = player.wicketsTaken;
+                const runs = player.runs ?? 0;
+                const wickets = player.wicketsTaken ?? 0;
                 if(mData.maxRuns < runs){
                  mData.maxRuns = runs;
                  mData.rPlayer = player.name;
@@ -64,8 +76,8 @@ export class TodaysMatchesPage implements OnInit,OnDestroy {
                 }
             })
             match.teams.teamB.players.forEach(player => {
-              const runs = player.runs;
-              const wickets = player.wicketsTaken;
+              const runs = player.runs ?? 0;
+              const wickets = player.wicketsTaken ?? 0;
               if(mData.maxRuns < runs){
                 mData.maxRuns = runs;
                 mData.rPlayer = player.name;
@@ -96,6 +108,16 @@ export class TodaysMatchesPage implements OnInit,OnDestroy {
     this.apiService.fetchTodaysMatchesList().subscribe(() => {
       //updating matches list...
       loader.dismiss();
+    }, () => {
+      loader.dismiss();
+      this.toastCtrl.create({
+        message: 'Unable to load today\'s matches.',
+        color: 'danger',
+        position: 'bottom',
+        duration: 2500
+      }).then(toast => {
+        toast.present();
+      });
     });
   });
   }
@@ -108,6 +130,61 @@ export class TodaysMatchesPage implements OnInit,OnDestroy {
     modal.present();
     return modal.onDidDismiss();
   })
+}
+
+async confirmDeleteMatch(match: Match) {
+  if (!this.canManageMatches) {
+    this.showToast('Only Admin can delete matches.', 'warning');
+    return;
+  }
+
+  const alert = await this.alertCtrl.create({
+    header: 'Delete match?',
+    message: 'This will permanently delete '+match.teams.teamA.name+' vs '+match.teams.teamB.name+'. This action cannot be undone.',
+    buttons: [
+      {
+        text: 'Cancel',
+        role: 'cancel'
+      },
+      {
+        text: 'Delete',
+        role: 'destructive',
+        handler: () => this.deleteMatch(match)
+      }
+    ]
+  });
+  await alert.present();
+}
+
+private deleteMatch(match: Match) {
+  this.loadingCtrl.create({
+    message: 'Deleting match...'
+  }).then(loader => {
+    loader.present();
+    this.apiService.deleteMatch(match).subscribe({
+      next: () => {
+        loader.dismiss();
+        this.loadedMatches = this.loadedMatches.filter(existingMatch => existingMatch.id !== match.id);
+        this.data = this.data.filter(item => item.matchId !== match.id);
+        this.showToast('Match deleted.', 'success');
+      },
+      error: error => {
+        loader.dismiss();
+        this.showToast(error?.message || 'Unable to delete match.', 'danger');
+      }
+    });
+  });
+}
+
+private showToast(message: string, color: string) {
+  this.toastCtrl.create({
+    message,
+    color,
+    position: 'bottom',
+    duration: 2500
+  }).then(toast => {
+    toast.present();
+  });
 }
   ngOnDestroy()
   {

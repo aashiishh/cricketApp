@@ -30,3 +30,7 @@ npm-debug.log*
 /plugins
 /www
 .angular/
+.firebase/
+build.out
+dev-server.err
+dev-server.out

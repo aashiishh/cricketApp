@@ -1,53 +1,107 @@
-.smtxt ion-label
-{
-    font-size: 15px;
-}
-.live
-{
-    background-color: rgb(55, 146, 55);
-    color: white;
-    margin-left: 58% !important;
-    font-size: 15px !important;
-}
-ion-card-title
-{
-    font-size: 16px;
-    color: rgb(6, 116, 6);
-}
-ion-card-content
-{
-    padding-bottom: 1px;
-    background-color : #ff4961;;
-    color: rgb(255, 255, 255);
-}
-ion-card-subtitle
-{
-    color: rgb(0, 0, 0);
-    text-align: center;
-    font-size: large;
-}
-ion-card-header
-{
-    padding-top: 2px;
-}
-p{
-    margin: 0px;
-}
-ion-chip
-{
-    font-size: large;
-}
-p ion-chip
-{
-    margin: 0px;
-    font-size: 12px;
+.matches-page {
+  ion-list {
+    background: transparent;
+    padding: 12px;
+  }
 
+  ion-list-header {
+    color: var(--cricket-muted);
+    font-weight: 800;
+    letter-spacing: 0;
+    padding-inline-start: 6px;
+  }
+
+  ion-chip {
+    --background: rgba(244, 197, 66, 0.13);
+    --color: var(--cricket-accent);
+    border: 1px solid rgba(244, 197, 66, 0.24);
+    font-weight: 700;
+  }
+
+  img {
+    border: 1px solid var(--cricket-line);
+    border-radius: 50%;
+    height: 84px;
+    margin-top: 14px;
+    object-fit: cover;
+    width: 84px;
+  }
 }
-.smtxt
-{
+
+.match-card {
+  margin: 0 0 14px;
+  overflow: hidden;
+
+  p {
+    margin: 0;
+    padding: 12px 12px 0;
+  }
+
+  ion-card-header {
+    padding: 10px 14px 4px;
+  }
+
+  ion-card-title {
+    color: var(--cricket-text);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  ion-card-subtitle {
     text-align: center;
+  }
+
+  ion-card-content {
+    color: var(--cricket-muted);
+    padding: 8px 14px 2px;
+  }
+
+  h2,
+  h3 {
+    color: var(--cricket-text);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.45;
+    margin: 0 0 8px;
+  }
 }
-.smtxt ion-button
-{
-    font-size: 11px;
+
+.live {
+  --background: rgba(36, 198, 168, 0.15);
+  --color: var(--cricket-action);
+  border-color: rgba(36, 198, 168, 0.3);
+  float: right;
+}
+
+.abandoned {
+  --background: rgba(220, 38, 38, 0.12);
+  --color: var(--cricket-danger);
+  border-color: rgba(220, 38, 38, 0.24);
+  float: right;
+}
+
+.smtxt,
+.match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px 14px 16px;
+
+  ion-button {
+    --background: var(--cricket-action);
+    --background-activated: #1fac93;
+    --border-radius: 8px;
+    --box-shadow: none;
+    --color: #ffffff;
+    font-weight: 800;
+    text-transform: none;
+  }
+
+  ion-button[color="danger"] {
+    --background: transparent;
+    --background-activated: rgba(220, 38, 38, 0.08);
+    --border-color: var(--cricket-danger);
+    --color: var(--cricket-danger);
+  }
 }

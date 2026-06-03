@@ -1,4 +1,13 @@
-<ion-content>
+<ion-header>
+  <ion-toolbar class="cricket-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Rematch</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cricket-page rematch-page">
 <!-- Skeleton screen -->
 <div *ngIf="!data">
   <div class="ion-padding custom-skeleton">

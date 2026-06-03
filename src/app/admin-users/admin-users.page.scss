@@ -1,0 +1,153 @@
+.admin-users-page {
+  --background: #eaf3ff;
+}
+
+.admin-users-shell {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 860px;
+  padding: 16px;
+}
+
+.access-hero {
+  border-top: 4px solid #2454d8;
+  padding: 22px;
+}
+
+.access-hero span {
+  color: #2454d8;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.access-hero h1 {
+  color: #0b2146;
+  font-size: clamp(30px, 6vw, 44px);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  margin: 8px 0 10px;
+}
+
+.access-hero p {
+  color: #526d99;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.user-list {
+  padding: 14px;
+}
+
+.section-title {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-title h2 {
+  color: #0b2146;
+  font-size: 18px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.section-title span {
+  color: #55719d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.user-row {
+  align-items: center;
+  border-bottom: 1px solid #d7e5ff;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 48px minmax(0, 1fr) minmax(120px, 170px);
+  padding: 14px 0;
+}
+
+.user-row:last-child {
+  border-bottom: 0;
+}
+
+.user-avatar {
+  align-items: center;
+  background: #e6f0ff;
+  border: 1px solid #bdd4ff;
+  border-radius: 50%;
+  color: #2454d8;
+  display: grid;
+  height: 44px;
+  place-items: center;
+  width: 44px;
+}
+
+.user-avatar ion-icon {
+  font-size: 28px;
+}
+
+.user-info h3 {
+  color: #0b2146;
+  font-size: 16px;
+  font-weight: 900;
+  margin: 0 0 3px;
+}
+
+.user-info p {
+  color: #55719d;
+  font-size: 13px;
+  margin: 0 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-chip {
+  background: #e7efff;
+  border: 1px solid #bfd4ff;
+  border-radius: 999px;
+  color: #2454d8;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 9px;
+}
+
+.role-chip.super {
+  background: #0b2146;
+  border-color: #0b2146;
+  color: #ffffff;
+}
+
+.empty-state {
+  color: #55719d;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 28px 12px;
+  text-align: center;
+}
+
+.empty-state ion-icon {
+  color: #2454d8;
+  font-size: 42px;
+}
+
+@media (max-width: 540px) {
+  .admin-users-shell {
+    padding: 10px;
+  }
+
+  .user-row {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .user-row ion-select {
+    grid-column: 2;
+    width: 100%;
+  }
+}

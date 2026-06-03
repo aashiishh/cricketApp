@@ -1,6 +1,8 @@
 <ion-list lines="none">
   <!-- <ion-item  button (click)="close('oc')"><ion-icon name="checkmark-circle-outline"></ion-icon>Overs Completed</ion-item> -->
-  <ion-item  button (click)="close('db')"><ion-icon name="remove-circle-outline"></ion-icon>Dismiss Batsman</ion-item>
-  <ion-item  button (click)="close('sb')"><ion-icon name="swap-horizontal-outline"></ion-icon>Switch Batsman</ion-item>
-  <ion-item  button (click)="close('cb')"><ion-icon name="person"></ion-icon>Change Bowler</ion-item>
+  <ion-item *ngIf="canScoreMatch" button (click)="close('undo')"><ion-icon name="arrow-undo-outline"></ion-icon>Undo Last Ball</ion-item>
+  <ion-item *ngIf="canScoreMatch" button (click)="close('db')"><ion-icon name="remove-circle-outline"></ion-icon>Dismiss Batsman</ion-item>
+  <ion-item *ngIf="canScoreMatch" button (click)="close('sb')"><ion-icon name="swap-horizontal-outline"></ion-icon>Switch Batsman</ion-item>
+  <ion-item *ngIf="canScoreMatch" button (click)="close('cb')"><ion-icon name="person"></ion-icon>Change Bowler</ion-item>
+  <ion-item *ngIf="canManageMatches" button (click)="close('abandon')"><ion-icon name="stop-circle-outline"></ion-icon>Abandon Match</ion-item>
 </ion-list>

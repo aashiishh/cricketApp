@@ -7,7 +7,9 @@ import { BatBowlSelectionComponent } from '../bat-bowl-selection/bat-bowl-select
 import { Ball } from '../models/ball';
 import { Match } from '../models/match';
 import { Overs } from '../models/overs';
+import { Player } from '../models/players';
 import { TeamOvers } from '../models/teamOvers';
+import { Teams } from '../models/teams';
 
 @Component({
   selector: 'app-rematch-selection',
@@ -35,18 +37,59 @@ export class RematchSelectionPage implements OnInit,OnDestroy {
   data : boolean = true;
   constructor(private apiService:ApiServiceService,private modalCtrl: ModalController,private loadingCtrl:LoadingController,private toastCtrl:ToastController,private router:Router) { }
 
+  private resetPlayerForRematch(player: Player): Player {
+    return {
+      ...player,
+      isSelected: false,
+      ballsPlayed: 0,
+      isWicket: false,
+      onPitch: false,
+      wicketsTaken: 0,
+      runsGiven: 0,
+      runs: 0,
+      isStriker: false
+    };
+  }
+
+  private cloneTeamsForRematch(): Teams {
+    return {
+      teamA: {
+        ...this.currentMatch.teams.teamA,
+        bat_bowl_first: '',
+        currentStatus: '',
+        players: this.currentMatch.teams.teamA.players.map(player => this.resetPlayerForRematch(player))
+      },
+      teamB: {
+        ...this.currentMatch.teams.teamB,
+        bat_bowl_first: '',
+        currentStatus: '',
+        players: this.currentMatch.teams.teamB.players.map(player => this.resetPlayerForRematch(player))
+      }
+    };
+  }
+
   ngOnInit() {
 
     this.matchSub = this.apiService.todaysMatches.subscribe(matches => {
       this.loadedMatches = matches;
       this.currentMatch = this.loadedMatches[this.loadedMatches.length - 1];
         })
-        this.rematch();
   }
   ionViewWillEnter()
   {
     this.data = false;
       this.apiService.fetchTodaysMatchesList().subscribe(matches => {
+        this.loadedMatches = matches;
+        this.currentMatch = this.loadedMatches[this.loadedMatches.length - 1];
+        this.rematch();
+      }, () => {
+        this.data = true;
+        this.toastCtrl.create({
+          message: 'Unable to load matches for rematch.',
+          color: 'danger',
+          position: 'bottom',
+          duration: 2500
+        }).then(toast => toast.present());
       });
   }
 
@@ -61,24 +104,8 @@ export class RematchSelectionPage implements OnInit,OnDestroy {
     }).then(loader => {
       loader.present();
       let matchNumber = (this.loadedMatches.length)+1;
-      let l_id = 'Match'+matchNumber;
-      let l_teams = this.currentMatch.teams;
-      l_teams.teamA.players.forEach(player =>{
-        player.ballsPlayed = 0;
-        player.isWicket = undefined;
-        player.onPitch = false;
-        player.wicketsTaken = 0;
-        player.runsGiven = 0;
-        player.runs = 0;
-      })
-      l_teams.teamB.players.forEach(player =>{
-        player.ballsPlayed = 0;
-        player.isWicket = undefined;
-        player.onPitch = false;
-        player.wicketsTaken = 0;
-        player.runsGiven = 0;
-        player.runs = 0;
-      })
+      let l_id = 'Match'+matchNumber+'_'+Date.now();
+      let l_teams = this.cloneTeamsForRematch();
       let count = this.currentMatch.teamOvers.oversCount;
       let l_teamOvers : TeamOvers= {
         teamAOvers : new Overs([],0,0),
@@ -139,38 +166,22 @@ export class RematchSelectionPage implements OnInit,OnDestroy {
         scoreboard : l_scoreboard,
         matchStatus : l_matchStatus
       }
-      this.apiService.onMatchCreated(match).subscribe(result => {
-        if(result){
-         console.log("Match Created");
-         loader.dismiss();
-         setTimeout(()=> {
-          this.data = true;
-        },3500)
+      loader.dismiss();
+      this.data = true;
+      this.modalCtrl.create({
+        component: BatBowlSelectionComponent,
+        componentProps: {match : match},
+        backdropDismiss: false
+      }).then(modal => {
+        modal.present();
+        return modal.onDidDismiss();
+      }).then(result => {
+        if (result.role === 'confirm') {
+          this.router.navigate(['/scoreboard', match.id]);
+        } else {
+          this.router.navigate(['/home']);
         }
-         else
-         console.log('Error occured while creating match');
-      })
-         loader.onDidDismiss().then(() => {
-            this.toastCtrl.create({
-              message: 'Creating new Match, please wait...',
-              color: 'dark',
-              position: 'middle',
-              duration: 1500
-            }).then(toast => {
-              toast.present();
-              toast.onDidDismiss().then(()=> {
-                this.modalCtrl.create({
-                  component: BatBowlSelectionComponent,
-                  componentProps: {match : match}  // 2nd match is the match defined in line 124
-                }).then(modal => {
-                  modal.present();
-                  return modal.onDidDismiss();
-                }).then(() => {
-                  this.router.navigateByUrl('/scoreboard');
-                });
-              })
-            })
-        })
+      });
    })
   }
 

@@ -1,15 +1,77 @@
-ion-card-title ion-chip
-{
+.match-detail-page {
+  ion-card {
+    margin: 14px;
+  }
 
-    font-size: 25px;
-}
-ion-card-title{
+  ion-card-title {
     text-align: center;
-}
-ion-card-subtitle
-{
+  }
+
+  ion-card-title ion-chip {
+    --background: rgba(244, 197, 66, 0.13);
+    --color: var(--cricket-accent);
+    border: 1px solid rgba(244, 197, 66, 0.24);
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  ion-card-subtitle {
+    color: var(--cricket-muted);
+    font-size: 1rem;
+    line-height: 1.4;
     text-align: center;
-    font-size: 18px;
-    font-family: 'Times New Roman', Times, serif;
-    color: green;
+  }
+
+  ion-list {
+    background: transparent;
+    padding: 0 14px 14px;
+  }
+
+  ion-list-header,
+  ion-item {
+    --background: var(--cricket-surface);
+    --color: var(--cricket-text);
+  }
+
+  ion-list-header {
+    border: 1px solid var(--cricket-line);
+    border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+    color: var(--cricket-accent);
+    font-weight: 800;
+  }
+
+  ion-item {
+    --border-color: var(--cricket-line);
+    border-inline: 1px solid var(--cricket-line);
+  }
+
+  ion-avatar {
+    align-items: center;
+    background: var(--cricket-surface-strong);
+    border: 1px solid var(--cricket-line);
+    display: flex;
+    justify-content: center;
+  }
+
+  ion-avatar ion-icon {
+    color: var(--cricket-accent);
+    font-size: 34px;
+  }
+
+  h2,
+  h3 {
+    color: var(--cricket-text);
+  }
+}
+
+.dialog-close-button {
+  --color: var(--cricket-text);
+  --color-hover: var(--cricket-accent);
+  --padding-end: 10px;
+  --padding-start: 10px;
+
+  ion-icon {
+    font-size: 22px;
+  }
 }

@@ -24,3 +24,77 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+:root {
+  --cricket-bg: #eef5ff;
+  --cricket-surface: #ffffff;
+  --cricket-surface-strong: #e8f1ff;
+  --cricket-line: rgba(28, 78, 216, 0.16);
+  --cricket-text: #0b1f3f;
+  --cricket-muted: #56708f;
+  --cricket-accent: #1d4ed8;
+  --cricket-action: #0ea5e9;
+  --cricket-danger: #dc2626;
+}
+
+ion-toolbar.cricket-toolbar {
+  --background: #ffffff;
+  --border-color: var(--cricket-line);
+  --color: var(--cricket-text);
+  --min-height: 56px;
+}
+
+ion-toolbar.cricket-toolbar ion-title {
+  color: var(--cricket-text);
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+ion-toolbar.cricket-toolbar ion-buttons {
+  align-items: center;
+  min-width: 0;
+}
+
+ion-toolbar.cricket-toolbar ion-back-button,
+ion-toolbar.cricket-toolbar ion-button {
+  --color: var(--cricket-accent);
+  font-weight: 800;
+  text-transform: none;
+}
+
+ion-toolbar.cricket-toolbar ion-back-button::part(text) {
+  display: none;
+}
+
+ion-toolbar.cricket-toolbar ion-back-button {
+  min-width: 44px;
+}
+
+.cricket-page {
+  --background: var(--cricket-bg);
+  color: var(--cricket-text);
+}
+
+.cricket-card {
+  background: var(--cricket-surface);
+  border: 1px solid var(--cricket-line);
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(29, 78, 216, 0.12);
+  color: var(--cricket-text);
+}
+
+.cricket-card ion-card-title,
+.cricket-card ion-card-subtitle {
+  color: var(--cricket-text);
+}
+
+.cricket-card ion-card-subtitle {
+  color: var(--cricket-muted);
+}
+
+ion-toast.otp-disabled-toast {
+  --background: var(--cricket-danger);
+  --color: #ffffff;
+  font-weight: 700;
+}

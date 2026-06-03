@@ -1,19 +1,23 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Welcome!!</ion-title>
-    <ion-buttons *ngIf="teamA.name && teamB.name" slot="primary">
-      <ion-button color="danger" fill="clear" (click)="onAddPlayer()">
+  <ion-toolbar class="cricket-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create Match</ion-title>
+    <ion-buttons *ngIf="teamA.name && teamB.name && canManagePlayers" slot="primary">
+      <ion-button fill="clear" (click)="onAddPlayer()">
+        <ion-icon slot="start" name="person-add-outline"></ion-icon>
         Add Player
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="cricket-page create-page">
   <ion-grid>
     <form (ngSubmit)="onTeamsNameSubmitted()" #f="ngForm">
     <ion-row *ngIf="!teamA.name && !teamB.name" >
-      <ion-col size="10" offset="1">
+      <ion-col class="setup-card cricket-card" size="10" offset="1" size-md="6" offset-md="3">
         <ion-item>
           <ion-label position="floating">Enter name for teamA</ion-label>
           <ion-input type="text" ngModel name="name1" required></ion-input>
@@ -25,67 +29,93 @@
         </ion-item>
         <ion-item>
           <ion-label position="floating">Number of overs per Team</ion-label>
-          <ion-input type="number" ngModel name="oversCount" required></ion-input>
+          <ion-input type="number" min="1" max="50" step="1" ngModel name="oversCount" required></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="!teamA.name && !teamB.name">
-      <ion-col size="10" offset="1">
-        <ion-button type="submit" shape="round" expand="block" fill="solid" size="medium" color="danger" [disabled]="!f.valid">Done</ion-button>
+      <ion-col class="form-action-col" size="10" offset="1" size-md="6" offset-md="3">
+        <ion-button class="primary-action" type="submit" expand="block" fill="solid" size="medium" [disabled]="!f.valid">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Done
+        </ion-button>
       </ion-col>
     </ion-row>
     </form>
     <ion-row *ngIf="teamA.name && teamB.name">
-      <ion-col class="ion-text-center" size-md="6" offset-md="3">
-        <ion-item>
-          <ion-label>Select Team</ion-label>
-          <ion-select okText="Okay" cancelText="Dismiss" [(ngModel)]="selectedTeam">
-            <ion-select-option value="teamA">{{teamA.name}}</ion-select-option>
-            <ion-select-option value="teamB">{{teamB.name}}</ion-select-option>
-          </ion-select>
-        </ion-item>
+      <ion-col class="ion-text-center setup-card cricket-card" size-md="6" offset-md="3">
+        <div class="team-progress">
+          <button type="button" [class.active]="selectedTeam === 'teamA'" [class.ready]="isTeamReady('teamA')" (click)="selectedTeam = 'teamA'; onTeamDidChange()">
+            <span>{{teamA.name}}</span>
+            <strong>{{playersForTeam1.length}}</strong>
+          </button>
+          <button type="button" [class.active]="selectedTeam === 'teamB'" [class.ready]="isTeamReady('teamB')" (click)="selectedTeam = 'teamB'; onTeamDidChange()">
+            <span>{{teamB.name}}</span>
+            <strong>{{playersForTeam2.length}}</strong>
+          </button>
+        </div>
       </ion-col>
       </ion-row>
         <ion-row *ngIf="teamA.name && teamB.name && !selectedTeam">
-          <ion-col class="ion-text-center" size-md="6" offset-md="3">
+          <ion-col class="ion-text-center setup-card cricket-card" size-md="6" offset-md="3">
             <ion-list>
               <ion-list-header>
                 Available Players
               </ion-list-header>
               <ion-item *ngFor="let player of playerstoDisplay">
                 <ion-avatar slot="start">
-                   <img src={{player.imgUrl}}>
+                   <img *ngIf="player.imgUrl" [src]="player.imgUrl" (error)="player.imgUrl = ''">
+                   <ion-icon *ngIf="!player.imgUrl" name="person-circle-outline"></ion-icon>
                   <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
                 </ion-avatar>
                 <ion-label>
                   <h2>{{player.name}}</h2>
                   <h3>{{player.description}}</h3>
-                  <!-- <p>Listen, I've had a pretty messed up day...</p> -->
                 </ion-label>
+                <ion-button *ngIf="canManagePlayers" type="button" fill="clear" size="small" (click)="editPlayer(player)">
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button type="button" fill="clear" size="small" [routerLink]="['/player-profile', player.id]">
+                  <ion-icon slot="icon-only" name="stats-chart-outline"></ion-icon>
+                </ion-button>
               </ion-item>
               </ion-list>
           </ion-col>
           </ion-row>
     <ion-row *ngIf="teamA.name && teamB.name && selectedTeam">
-      <ion-col class="ion-text-center" size-md="6" offset-md="3">
+      <ion-col class="ion-text-center setup-card cricket-card" size-md="6" offset-md="3">
         <ion-list>
+          <ion-list-header>
+            {{getSelectedTeamName()}} Players - {{getSelectedTeamCount()}}
+          </ion-list-header>
           <ion-item *ngFor="let player of playerstoDisplay">
-            <ion-label>{{player.name}}</ion-label>
-            <ion-label style="font-size:x-small;">{{player.description}}</ion-label>
-            <ion-checkbox color="secondary" slot="end" [(ngModel)]="player.isSelected" (ionChange)="onPlayerDidSelected(player)"></ion-checkbox>
+                <ion-avatar slot="start">
+                  <img *ngIf="player.imgUrl" [src]="player.imgUrl" (error)="player.imgUrl = ''">
+                  <ion-icon *ngIf="!player.imgUrl" name="person-circle-outline"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{player.name}}</h2>
+                  <p>{{player.description}}</p>
+                </ion-label>
+                <ion-button *ngIf="canManagePlayers" type="button" fill="clear" size="small" (click)="editPlayer(player)">
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button type="button" fill="clear" size="small" [routerLink]="['/player-profile', player.id]">
+                  <ion-icon slot="icon-only" name="stats-chart-outline"></ion-icon>
+                </ion-button>
+                <ion-checkbox color="secondary" slot="end" [(ngModel)]="player.isSelected" (ionChange)="onPlayerDidSelected(player)"></ion-checkbox>
           </ion-item>
         </ion-list>
+        <div class="team-actions">
+          <ion-button type="button" fill="outline" expand="block" (click)="saveSelectedTeam()" [disabled]="getSelectedTeamCount() < 2">
+            Save {{getSelectedTeamName()}}
+          </ion-button>
+          <ion-button type="button" class="primary-action" expand="block" (click)="onCreateTeam()" [disabled]="!isTeamReady('teamA') || !isTeamReady('teamB')">
+            <ion-icon slot="start" name="play-circle-outline"></ion-icon>
+            Start Toss
+          </ion-button>
+        </div>
       </ion-col>
     </ion-row>
     </ion-grid>
-    <ion-fab  *ngIf="teamA.name && teamB.name && selectedTeam" vertical="bottom" horizontal="center" slot="fixed">
-      <ion-fab-button (click)="onCreateTeam()">
-        <ion-icon name="checkmark-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button routerLink="/home">
-        <ion-icon name="home-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
 </ion-content>

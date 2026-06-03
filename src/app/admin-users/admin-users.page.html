@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar class="cricket-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>User Access</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button fill="clear" (click)="loadUsers()">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cricket-page admin-users-page">
+  <main class="admin-users-shell">
+    <section class="access-hero cricket-card">
+      <span>Super Admin</span>
+      <h1>Role Management</h1>
+      <p>Give trusted accounts Admin access, or move Admin accounts back to Player.</p>
+    </section>
+
+    <section class="user-list cricket-card">
+      <div class="section-title">
+        <h2>Accounts</h2>
+        <span>{{users.length}} users</span>
+      </div>
+
+      <article class="user-row" *ngFor="let user of users">
+        <div class="user-avatar">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </div>
+        <div class="user-info">
+          <h3>{{getUserName(user)}}</h3>
+          <p>{{user.email || user.uid}}</p>
+          <span class="role-chip" [class.super]="user.role === 'super-admin'">{{getRoleLabel(user.role)}}</span>
+        </div>
+        <ion-select
+          interface="popover"
+          [disabled]="user.role === 'super-admin' || user.uid === authService.currentUser?.uid"
+          [value]="user.role"
+          (ionChange)="confirmRoleChange(user, $event.detail.value)">
+          <ion-select-option *ngIf="user.role === 'super-admin'" value="super-admin">Super Admin</ion-select-option>
+          <ion-select-option *ngFor="let role of assignableRoles" [value]="role">{{getRoleLabel(role)}}</ion-select-option>
+        </ion-select>
+      </article>
+
+      <div class="empty-state" *ngIf="!isLoading && users.length === 0">
+        <ion-icon name="people-circle-outline"></ion-icon>
+        <p>No user accounts found yet.</p>
+      </div>
+    </section>
+  </main>
+</ion-content>

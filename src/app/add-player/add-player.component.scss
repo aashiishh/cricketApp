@@ -1,0 +1,105 @@
+.add-player-page {
+  ion-grid {
+    margin: 0 auto;
+    max-width: 460px;
+    padding: 22px 18px 30px;
+  }
+
+  ion-item {
+    --background: var(--cricket-surface);
+    --border-color: var(--cricket-line);
+    --border-radius: 8px;
+    --color: var(--cricket-text);
+    min-height: 64px;
+    margin-bottom: 14px;
+  }
+}
+
+.photo-picker {
+  align-items: center;
+  background: var(--cricket-surface);
+  border: 1px solid var(--cricket-line);
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 86px minmax(0, 1fr);
+  margin: 4px 0 22px;
+  padding: 16px;
+}
+
+.photo-preview {
+  align-items: center;
+  background: var(--cricket-surface-strong);
+  border: 1px solid var(--cricket-line);
+  border-radius: 50%;
+  display: flex;
+  height: 86px;
+  justify-content: center;
+  overflow: hidden;
+  width: 86px;
+
+  img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  ion-icon {
+    color: var(--cricket-accent);
+    font-size: 52px;
+  }
+}
+
+ion-button {
+  --border-radius: 8px;
+  min-height: 46px;
+  text-transform: none;
+}
+
+.photo-action {
+  --background: var(--cricket-surface-strong);
+  --box-shadow: none;
+  --color: var(--cricket-accent);
+  border: 1px solid var(--cricket-line);
+  border-radius: 8px;
+  font-weight: 800;
+  min-width: 160px;
+}
+
+.primary-action {
+  --background: var(--cricket-accent);
+  --box-shadow: none;
+  --color: #ffffff;
+  font-weight: 800;
+}
+
+.cancel-action {
+  --border-color: var(--cricket-danger);
+  --color: var(--cricket-danger);
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.dialog-close-button {
+  --color: var(--cricket-text);
+  --color-hover: var(--cricket-accent);
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 420px) {
+  .add-player-page ion-grid {
+    padding: 16px 12px 22px;
+  }
+
+  .photo-picker {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .photo-action {
+    width: 100%;
+  }
+}
